@@ -15,6 +15,7 @@ public class MecanumTest extends LinearOpMode
     private DcMotor br;
     private DcMotor fl;
     private DcMotor bl;
+    //fr=front_right br=back_right fl=front_left bl=back_left
     @Override
     public void runOpMode(){
         fl=hardwareMap.dcMotor.get("frontleft");
