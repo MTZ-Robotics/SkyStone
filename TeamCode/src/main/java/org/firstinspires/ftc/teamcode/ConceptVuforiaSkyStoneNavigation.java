@@ -85,7 +85,9 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 @TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
 
 public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
-
+    // Turns flashlight on.
+    CameraDevice.getInstance().setFlashTorchMode(true);
+    $ git commit -S -m 6fd8512
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
     // 2) Phone Orientation. Choices are: PHONE_IS_PORTRAIT = true (portrait) or PHONE_IS_PORTRAIT = false (landscape)
