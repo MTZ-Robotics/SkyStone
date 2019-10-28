@@ -168,6 +168,18 @@ public class AutonomousMecanumExample extends LinearOpMode {
 //        GyroLeft(.50,-75,1000);
 //        GyroRight(.50,-15,1000);
 
+        frontLeft.setPower(1);
+        frontRight.setPower(1);
+        backLeft.setPower(1);
+        backRight.setPower(1);
+
+        sleep(1000);
+
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+
         // =========================================================================================
     }
 
