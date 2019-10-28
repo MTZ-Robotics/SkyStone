@@ -102,6 +102,10 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
          **/
         if (tfod != null) {
             tfod.activate();
+            //KWS
+            //Turn Flashlight On
+            com.vuforia.CameraDevice.getInstance().setFlashTorchMode(true);
+            //-KWS
         }
 
         /** Wait for the game to begin */
