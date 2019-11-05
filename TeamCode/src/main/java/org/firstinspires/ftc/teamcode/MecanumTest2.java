@@ -22,6 +22,7 @@ public class MecanumTest2 extends LinearOpMode
         arm=hardwareMap.dcMotor.get("arm");
         fl.setDirection(DcMotor.Direction.REVERSE);
         br.setDirection(DcMotor.Direction.REVERSE);
+        arm.setDirection(DcMotor.Direction.REVERSE);
 
         double halfspeed=1;
         double reverse=1;
