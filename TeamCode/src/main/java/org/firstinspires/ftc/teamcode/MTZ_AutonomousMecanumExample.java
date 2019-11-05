@@ -51,7 +51,7 @@ import java.util.List;
 
 // @Disabled
 
-public class AutonomousMecanumExample extends LinearOpMode {
+public class MTZ_AutonomousMecanumExample extends LinearOpMode {
 
     private DcMotor frontLeft = null;
     private DcMotor frontRight = null;
