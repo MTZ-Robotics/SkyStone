@@ -51,7 +51,7 @@ import java.util.List;
 
 // @Disabled
 
-public class AutonomousMecanumExample extends LinearOpMode {
+public class MTZ_AutonomousMecanumExample extends LinearOpMode {
 
     private DcMotor frontLeft = null;
     private DcMotor frontRight = null;
@@ -167,6 +167,18 @@ public class AutonomousMecanumExample extends LinearOpMode {
 //        GyroStrafe(36,.50,90,1000);
 //        GyroLeft(.50,-75,1000);
 //        GyroRight(.50,-15,1000);
+
+        frontLeft.setPower(1);
+        frontRight.setPower(1);
+        backLeft.setPower(1);
+        backRight.setPower(1);
+
+        sleep(1000);
+
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
 
         // =========================================================================================
     }
