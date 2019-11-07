@@ -15,8 +15,8 @@ public class DriverControlOpMTZ extends LinearOpMode {
     private DcMotor backLeft;
     private DcMotor arm;
 
-    Servo servo;
-    double servoPosition = 0.0;
+    private Servo servo;
+    private double servoPosition = 0.0;
 
     @Override
 
@@ -80,14 +80,14 @@ public class DriverControlOpMTZ extends LinearOpMode {
         }
     }
 
-    public void stat(String[] in){
+    private void stat(String[] in){
         for(String a : in){
             telemetry.addData("Status",a);
         }
         telemetry.update();
     }
 
-    public void stat(String in){
+    private void stat(String in){
         telemetry.addData("Status",in);
         telemetry.update();
     }
