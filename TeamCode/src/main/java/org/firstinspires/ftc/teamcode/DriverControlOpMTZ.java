@@ -80,14 +80,14 @@ public class DriverControlOpMTZ extends LinearOpMode {
         }
     }
 
-    private void stat(String[] in){
+    public void stat(String[] in){
         for(String a : in){
             telemetry.addData("Status",a);
         }
         telemetry.update();
     }
 
-    private void stat(String in){
+    public void stat(String in){
         telemetry.addData("Status",in);
         telemetry.update();
     }
