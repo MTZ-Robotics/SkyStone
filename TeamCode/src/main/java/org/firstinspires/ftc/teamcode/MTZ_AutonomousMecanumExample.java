@@ -173,7 +173,7 @@ public class MTZ_AutonomousMecanumExample extends LinearOpMode {
         backLeft.setPower(1);
         backRight.setPower(1);
 
-        sleep(1000);
+        sleep(3000);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
