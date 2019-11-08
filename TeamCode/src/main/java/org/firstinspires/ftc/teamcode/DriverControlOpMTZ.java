@@ -68,7 +68,7 @@ public class DriverControlOpMTZ extends LinearOpMode {
                 }
             }
 
-            stat(new String[]{"Drive Power (A): "+drivePower,"Drive Direction (B): "+driveDirection});
+            stat(new String[]{"Drive Power (A): "+drivePower,"Drive Direction (B): "+driveDirection, "Arm Power: "+gamepad2.left_stick_y});
 
             backLeft.setPower(drivePower*(driveDirection*(gamepad1.right_stick_y+gamepad1.left_stick_x)-gamepad1.right_stick_x));
             backRight.setPower(drivePower*(driveDirection*(gamepad1.right_stick_y-gamepad1.left_stick_x)+gamepad1.right_stick_x));
