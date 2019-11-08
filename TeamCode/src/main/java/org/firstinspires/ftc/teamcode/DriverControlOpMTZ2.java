@@ -34,8 +34,6 @@ public class DriverControlOpMTZ2 extends LinearOpMode {
         double drivePower = 1;
         double driveDirection = 1;
         boolean aButtonPressed = false;
-        boolean clawClose = false;
-        boolean clawOpen = false;
         boolean bButtonPressed = false;
 
         stat("HardwareMap Complete");
