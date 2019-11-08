@@ -38,12 +38,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class AutonomousMTZ extends LinearOpMode {
 
-    private DcMotor frontLeft = null;
-    private DcMotor frontRight = null;
-    private DcMotor backLeft = null;
-    private DcMotor backRight = null;
-    private DcMotor arm = null;
-    private Servo servo = null;
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private DcMotor arm;
+    private Servo servo;
 
     private static final double ticks = 1440;
     private static final double gearReduction = 5.2;
