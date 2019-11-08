@@ -14,7 +14,6 @@ public class DriverControlOpMTZ extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
-
     private Servo servo;
     private double servoPosition = 0.0;
 
