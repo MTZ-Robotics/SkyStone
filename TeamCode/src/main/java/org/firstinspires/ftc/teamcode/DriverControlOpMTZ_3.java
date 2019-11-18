@@ -71,7 +71,15 @@ public class DriverControlOpMTZ_3 extends LinearOpMode {
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontRight.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
+//<<<<<<< HEAD
             arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
+//=======
+            if(gamepad2.left_stick_y>=0) {
+                arm.setPower((gamepad2.left_stick_y * -0.2) - 0.2);
+            } else {
+                arm.setPower((gamepad2.left_stick_y * -0.1) - 0.2);
+            }
+//>>>>>>> b806f0a0feeb76ad7e1b224d1fafd412450e15b0
             //servo.setPosition(gamepad2.right_stick_y);
         if(gamepad2.b){
             claw.setPosition(0);
