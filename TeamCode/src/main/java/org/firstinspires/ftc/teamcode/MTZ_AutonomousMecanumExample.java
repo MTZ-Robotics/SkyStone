@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
@@ -49,7 +50,7 @@ import java.util.List;
 
 @Autonomous(name ="AutonomousMecanumExample")
 
-// @Disabled
+@Disabled
 
 public class MTZ_AutonomousMecanumExample extends LinearOpMode {
 
@@ -173,7 +174,7 @@ public class MTZ_AutonomousMecanumExample extends LinearOpMode {
         backLeft.setPower(1);
         backRight.setPower(1);
 
-        sleep(1000);
+        sleep(3000);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);

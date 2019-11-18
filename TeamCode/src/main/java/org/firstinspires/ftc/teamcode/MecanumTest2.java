@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
-
+@Disabled
 public class MecanumTest2 extends LinearOpMode
 {
     private DcMotor fr;
@@ -13,6 +15,8 @@ public class MecanumTest2 extends LinearOpMode
     private DcMotor fl;
     private DcMotor bl;
     private DcMotor arm;
+    Servo servo;
+    double servoPosition = 0.0;
     @Override
     public void runOpMode(){
         fl=hardwareMap.dcMotor.get("frontLeft");
@@ -20,9 +24,10 @@ public class MecanumTest2 extends LinearOpMode
         bl=hardwareMap.dcMotor.get("backLeft");
         br=hardwareMap.dcMotor.get("backRight");
         arm=hardwareMap.dcMotor.get("arm");
+        servo=hardwareMap.servo.get("claw");
+        servo.setPosition(servoPosition);
         fl.setDirection(DcMotor.Direction.REVERSE);
         br.setDirection(DcMotor.Direction.REVERSE);
-        arm.setDirection(DcMotor.Direction.REVERSE);
 
         double halfspeed=1;
         double reverse=1;
@@ -31,7 +36,6 @@ public class MecanumTest2 extends LinearOpMode
         stat("HardwareMap Complete");
         waitForStart();
         while(!gamepad1.dpad_up&&opModeIsActive()){
-            if(gamepad1.dpad_down){motortest();}
 
             if(gamepad1.a){
                 apress=true;
@@ -58,30 +62,17 @@ public class MecanumTest2 extends LinearOpMode
                     reverse=-1;
                 }
             }
-            stat(new String[]{"Halfspeed (A): "+halfspeed,"Running TeleOp","Reverse (B): "+reverse,"DPAD-Up To Exit OpMode","DPAD-Down to run Motor Test"});
+            stat(new String[]{"Halfspeed (A): "+halfspeed,"Reverse (B): "+reverse,"Running TeleOp","DPAD-Up To Exit OpMode","DPAD-Down to run Motor Test"});
             bl.setPower(halfspeed*(reverse*(gamepad1.right_stick_y+gamepad1.left_stick_x)-gamepad1.right_stick_x));
             br.setPower(halfspeed*(reverse*(gamepad1.right_stick_y-gamepad1.left_stick_x)+gamepad1.right_stick_x));
             fl.setPower(halfspeed*(reverse*(-gamepad1.right_stick_y+gamepad1.left_stick_x)+gamepad1.right_stick_x));
             fr.setPower(halfspeed*(reverse*(-gamepad1.right_stick_y-gamepad1.left_stick_x)-gamepad1.right_stick_x));
-            arm.setPower(halfspeed*(reverse*(gamepad2.left_stick_y)));
+            arm.setPower(gamepad2.left_stick_y);
+            servo.setPosition(gamepad2.right_stick_y);
         }
     }
 
-    public void motortest(){
-        int count=0;
-        motorstop();
-        for(DcMotor M : new DcMotor[]{fl,bl,fr,br,arm}){
-            stat(new String[] {"Running Motor Test","Running Motor "+count});
-            M.setDirection(DcMotor.Direction.FORWARD);
-            M.setPower(1);
-            sleep(1000);
-            M.setPower(-1);
-            sleep(1000);
-            M.setPower(0);
-            sleep(1000);
-            count++;
-        }
-    }
+
 
     public void stat(String[] in){
         for(String a : in){
