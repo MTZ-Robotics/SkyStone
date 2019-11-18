@@ -56,7 +56,7 @@ public class DCS_Autonomous extends LinearOpMode {
     private DcMotor backLeft = null;
     private DcMotor backRight = null;
 
-    private Servo servoArm = null;
+    private Servo claw = null;
 
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
@@ -82,7 +82,7 @@ public class DCS_Autonomous extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
 
-        servoArm = hardwareMap.servo.get("servoArm");
+        claw = hardwareMap.servo.get("claw");
 
         navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
         gyro = (IntegratingGyroscope) navxMicro;
@@ -90,7 +90,7 @@ public class DCS_Autonomous extends LinearOpMode {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
 
-        servoArm.setPosition(0);
+        claw.setPosition(0);
 
         StopAndResetEncoder();
         RunUsingEncoder();

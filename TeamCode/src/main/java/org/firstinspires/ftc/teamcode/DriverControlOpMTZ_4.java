@@ -2,14 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 //@Disabled
 
-public class DriverControlOpMTZ_3 extends LinearOpMode {
+public class DriverControlOpMTZ_4 extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -63,6 +62,17 @@ public class DriverControlOpMTZ_3 extends LinearOpMode {
                 } else {
                     driveDirection = -1;
                 }
+            }
+
+            if (gamepad2.left_bumper) {
+                arm.setPower(0);
+            }
+
+            if (gamepad2.right_bumper) {
+                arm.setPower(0.4);
+                sleep(100);
+
+                arm.setPower(0.2);
             }
 
 

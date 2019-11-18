@@ -2,14 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 //@Disabled
 
-public class DriverControlOpMTZ_3 extends LinearOpMode {
+public class MTZ_Driver_Status extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -65,8 +64,20 @@ public class DriverControlOpMTZ_3 extends LinearOpMode {
                 }
             }
 
+            if (gamepad2.left_bumper) {
+                arm.setPower(0);
+            }
 
-            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition()});
+            if (gamepad2.right_bumper) {
+                arm.setPower(0.4);
+                sleep(100);
+
+                arm.setPower(0.2);
+            }
+
+
+            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition(),
+                            "Pad 1: ", gamepad1.right_stick_y, " ", gamepad1.left_stick_x, " ", gamepad1.right_stick_x, " ", gamepad2.b});
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
