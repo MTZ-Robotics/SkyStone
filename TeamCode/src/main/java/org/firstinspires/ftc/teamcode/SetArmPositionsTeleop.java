@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name ="SetArmPositionsTeleop")
+@TeleOp(name="SetArmPositions-Time", group ="Concept")
 //@Disabled
 
 public class SetArmPositionsTeleop extends LinearOpMode {

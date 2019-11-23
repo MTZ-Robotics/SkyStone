@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-@TeleOp
+@TeleOp(name="Driver Status", group ="Concept")
 //@Disabled
 
 public class MTZ_Driver_Status extends LinearOpMode {
@@ -77,8 +77,13 @@ public class MTZ_Driver_Status extends LinearOpMode {
             }
 
 
-           stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition(),
-                            "Pad 1: " + gamepad1.right_stick_y + " " + gamepad1.left_stick_x, " " + gamepad1.right_stick_x, " " + gamepad2.b});
+           stat(new String[]{"Drive Power (A): " + drivePower,
+                   "Drive Direction (B): " + driveDirection,
+                   "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1,
+                   "Claw Position" + claw.getPosition(),
+                   "Pad 1: " + gamepad1.left_stick_y + " " + gamepad1.left_stick_x + gamepad1.right_stick_y + " " + gamepad1.right_stick_x +
+                           " " + gamepad2.b
+           });
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));

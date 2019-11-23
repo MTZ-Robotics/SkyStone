@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="SlideLeft_01")
+@Autonomous(name ="SlideLeft-15s", group ="A_Top")
 //@Disabled
 
 public class SlideLeft_01 extends LinearOpMode {

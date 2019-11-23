@@ -83,8 +83,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
-@Disabled
+@TeleOp(name="SKYSTONE Vuforia Nav", group ="Test")
+//@Disabled
 public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
     // Turns flashlight on.
     // CameraDevice.getInstance().setFlashTorchMode(true);

@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 
-@TeleOp
-@Disabled
+@TeleOp(name="Sampling Test", group ="Test")
+//@Disabled
 public class SamplingTest_Take_1 extends LinearOpMode {
 
     ColorSensor colorSensor;    // Hardware Device Object
