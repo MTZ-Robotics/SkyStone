@@ -35,7 +35,7 @@ import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
 /*
@@ -46,20 +46,20 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * The op mode assumes that the color sensor
  * is configured with a name of "sensor_color".
  *
- * You can use the X button on gamepad1 to toggle the LED on and off.
- *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name = "Sensor: MR Color", group = "Sensor")
+@Autonomous
 @Disabled
-public class SensorMRColor extends LinearOpMode {
-
-  ColorSensor colorSensor;    // Hardware Device Object
-
 
   @Override
-  public void runOpMode() {
+  public class ColorSensorTest extends LinearOpMode {
+
+    private DcMotor frontLeft;
+    private DcMotor frontRight;
+    private DcMotor backLeft;
+    private DcMotor backRight;
+    private ColorSensor colorSensor;    // Hardware Device Object
 
     // hsvValues is an array that will hold the hue, saturation, and value information.
     float hsvValues[] = {0F,0F,0F};
