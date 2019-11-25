@@ -2,22 +2,20 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="MTZ Driver 2", group ="A_Top")
+@TeleOp(name="MTZ Driver 4", group ="A_Top")
 //@Disabled
 
-public class DriverControlOpMTZ2 extends LinearOpMode {
+public class DriverControlOpMTZ_4 extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
-    private Servo servo;
-    private double servoPosition = 0.0;
+    private Servo claw;
 
     @Override
 
@@ -28,10 +26,10 @@ public class DriverControlOpMTZ2 extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
-        servo = hardwareMap.servo.get("claw");
+        claw = hardwareMap.servo.get("claw");
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        servo.setPosition(servoPosition);
+        claw.setPosition(0);
 
         double drivePower = 1;
         double driveDirection = 1;
@@ -66,19 +64,30 @@ public class DriverControlOpMTZ2 extends LinearOpMode {
                 }
             }
 
+            if (gamepad2.left_bumper) {
+                arm.setPower(0);
+            }
 
-            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1});
+            if (gamepad2.right_bumper) {
+                arm.setPower(0.4);
+                sleep(100);
+
+                arm.setPower(0.2);
+            }
+
+
+            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition()});
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontRight.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
-            arm.setPower((gamepad2.left_stick_y - 0.2) * -1);
+            arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
             //servo.setPosition(gamepad2.right_stick_y);
         if(gamepad2.b){
-            servo.setPosition(0);
+            claw.setPosition(0);
         }
         if(gamepad2.a){
-            servo.setPosition(1);
+            claw.setPosition(1);
         }
 
         }

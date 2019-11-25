@@ -30,11 +30,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name ="AutonomousMTZ")
+@Disabled
 
 public class AutonomousMTZ extends LinearOpMode {
 
@@ -76,9 +78,9 @@ public class AutonomousMTZ extends LinearOpMode {
         // Autonomous sequence:
         // =========================================================================================
 
-HoldArmPosition();
-DriveByInches(24);
-StopAndResetEncoder();
+            HoldArmPosition();
+            DriveByInches(24);
+            StopAndResetEncoder();
 
         // =========================================================================================
     }

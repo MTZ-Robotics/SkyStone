@@ -2,10 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp
+@TeleOp(name="MTZ Driver 3", group ="A_Top")
+//@Disabled
 
 public class DriverControlOpMTZ_3 extends LinearOpMode {
 
@@ -14,8 +16,7 @@ public class DriverControlOpMTZ_3 extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
-    private Servo servo;
-    private double servoPosition = 0.0;
+    private Servo claw;
 
     @Override
 
@@ -26,10 +27,10 @@ public class DriverControlOpMTZ_3 extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
-        servo = hardwareMap.servo.get("claw");
+        claw = hardwareMap.servo.get("claw");
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        servo.setPosition(servoPosition);
+        claw.setPosition(0);
 
         double drivePower = 1;
         double driveDirection = 1;
@@ -65,22 +66,26 @@ public class DriverControlOpMTZ_3 extends LinearOpMode {
             }
 
 
-            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + servo.getPosition()});
+            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition()});
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontRight.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
+//<<<<<<< HEAD
+            arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
+//=======
             if(gamepad2.left_stick_y>=0) {
                 arm.setPower((gamepad2.left_stick_y * -0.2) - 0.2);
             } else {
                 arm.setPower((gamepad2.left_stick_y * -0.1) - 0.2);
             }
+//>>>>>>> b806f0a0feeb76ad7e1b224d1fafd412450e15b0
             //servo.setPosition(gamepad2.right_stick_y);
         if(gamepad2.b){
-            servo.setPosition(0);
+            claw.setPosition(0);
         }
         if(gamepad2.a){
-            servo.setPosition(1);
+            claw.setPosition(1);
         }
 
         }
