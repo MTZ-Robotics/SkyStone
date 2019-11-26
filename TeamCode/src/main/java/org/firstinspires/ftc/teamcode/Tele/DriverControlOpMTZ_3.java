@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="MTZ Driver 3", group ="A_Top")
-//@Disabled
+@Disabled
 
 public class DriverControlOpMTZ_3 extends LinearOpMode {
 
