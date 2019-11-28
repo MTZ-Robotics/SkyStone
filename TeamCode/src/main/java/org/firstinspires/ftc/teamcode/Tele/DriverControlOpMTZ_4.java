@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @TeleOp(name="MTZ Driver 4", group ="A_Top")
 //@Disabled
+//This code was working on 11/25/2019
+//This code uses a constant power to keep the arm in position while gravity tries to pull it down
 
 public class DriverControlOpMTZ_4 extends LinearOpMode {
 
