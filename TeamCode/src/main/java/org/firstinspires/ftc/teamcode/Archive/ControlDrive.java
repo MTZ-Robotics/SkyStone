@@ -4,13 +4,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@TeleOp(name="Driver Status", group ="Concept")
+//@TeleOp(name="Arm Controls", group ="z_controls")
 //@Disabled
 
-public class MTZ_Driver_Status extends LinearOpMode {
+//This code has reference to a package .tele . This reference was created because of the folder
+//structure at the time. This reference may be a problem.
+//
+//This code uses a constant power to keep the arm in position while gravity tries to pull it down
+
+public class ControlDrive extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -78,19 +81,14 @@ public class MTZ_Driver_Status extends LinearOpMode {
             }
 
 
-           stat(new String[]{"Drive Power (A): " + drivePower,
-                   "Drive Direction (B): " + driveDirection,
-                   "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1,
-                   "Claw Position" + claw.getPosition(),
-                   "Pad 1: " + gamepad1.left_stick_y + " " + gamepad1.left_stick_x + gamepad1.right_stick_y + " " + gamepad1.right_stick_x +
-                           " " + gamepad2.b
-           });
+            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition()});
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontRight.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
             arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
             //servo.setPosition(gamepad2.right_stick_y);
+           // CoachSchererVuforiaSkyStoneNavigation
         if(gamepad2.b){
             claw.setPosition(0);
         }

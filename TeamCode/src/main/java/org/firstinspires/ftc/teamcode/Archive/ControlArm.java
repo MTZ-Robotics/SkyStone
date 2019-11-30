@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="MTZ Driver 5", group ="A_Top")
+//@TeleOp(name="MTZ Driver 5", group ="A_Top")
 //@Disabled
 
 //This code has reference to a package .tele . This reference was created because of the folder
@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 //
 //This code uses a constant power to keep the arm in position while gravity tries to pull it down
 
-public class DriverControlOpMTZ_5 extends LinearOpMode {
+public class ControlArm {
 
     private DcMotor frontRight;
     private DcMotor backRight;

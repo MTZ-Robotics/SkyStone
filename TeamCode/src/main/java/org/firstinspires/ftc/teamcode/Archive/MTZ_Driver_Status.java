@@ -4,16 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import org.firstinspires.ftc.teamcode.DriverControlOpMTZ_4;
 
-@TeleOp(name="MTZ Driver 5", group ="A_Top")
+
+@TeleOp(name="Driver Status", group ="Concept")
 //@Disabled
 
-//This code has reference to a package .tele . This reference was created because of the folder
-//structure at the time. This reference may be a problem.
-//
-//This code uses a constant power to keep the arm in position while gravity tries to pull it down
-
-public class DriverControlOpMTZ_5 extends LinearOpMode {
+public class MTZ_Driver_Status extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -41,7 +40,7 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
         boolean aButtonPressed = false;
         boolean bButtonPressed = false;
 
-        stat("HardwareMap Complete");
+        DriverControlOpMTZ_4.stat("HardwareMap Complete");
 
         waitForStart();
 
@@ -81,14 +80,19 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
             }
 
 
-            stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition()});
+           DriverControlOpMTZ_4.stat(new String[]{"Drive Power (A): " + drivePower,
+                   "Drive Direction (B): " + driveDirection,
+                   "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1,
+                   "Claw Position" + claw.getPosition(),
+                   "Pad 1: " + gamepad1.left_stick_y + " " + gamepad1.left_stick_x + gamepad1.right_stick_y + " " + gamepad1.right_stick_x +
+                           " " + gamepad2.b
+           });
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
             backRight.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y - gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontRight.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
             arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
             //servo.setPosition(gamepad2.right_stick_y);
-           // CoachSchererVuforiaSkyStoneNavigation
         if(gamepad2.b){
             claw.setPosition(0);
         }
@@ -99,6 +103,7 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
         }
     }
 
+   /*
     public void stat(String[] in){
         for(String a : in){
             telemetry.addData("Status",a);
@@ -116,4 +121,6 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
             M.setPower(0);
         }
     }
+
+    */
 }
