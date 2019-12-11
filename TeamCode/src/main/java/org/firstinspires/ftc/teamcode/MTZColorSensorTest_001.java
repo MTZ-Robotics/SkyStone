@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name = "MTZColorSensorTest_001", group = "A_Top")
+@TeleOp(name = "MTZColorSensorTest_001", group = "Test")
 //@Disabled
 public class MTZColorSensorTest_001 extends LinearOpMode {
 

@@ -5,15 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="MTZ Driver 5", group ="Concept")
+@TeleOp(name="MTZ Driver 8", group ="Concept")
 //@Disabled
 
-//This code has reference to a package .tele . This reference was created because of the folder
-//structure at the time. This reference may be a problem.
-//
+
 //This code uses a constant power to keep the arm in position while gravity tries to pull it down
 
-public class DriverControlOpMTZ_5 extends LinearOpMode {
+public class DriverControlOpMTZ_8 extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -21,6 +19,8 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
     private DcMotor backLeft;
     private DcMotor arm;
     private Servo claw;
+    private Servo leftHook;
+    private Servo rightHook;
 
     @Override
 
@@ -35,6 +35,8 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         claw.setPosition(0);
+        leftHook.setPosition(0.5);
+        rightHook.setPosition(0.5);
 
         double drivePower = 1;
         double driveDirection = 1;
@@ -79,7 +81,11 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
 
                 arm.setPower(0.2);
             }
-            //Please leave clear comments to make it easier for others! Thank you!
+            /***************************************************************************************
+             *
+             * Please leave clear comments on what you delete and to tell what things do! Thank you!
+             *
+             **************************************************************************************/
 
             stat(new String[]{"Drive Power (A): " + drivePower, "Drive Direction (B): " + driveDirection, "Arm Power: " + (gamepad2.left_stick_y - 0.2) * -1, "Claw Position" + claw.getPosition()});
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
@@ -87,7 +93,16 @@ public class DriverControlOpMTZ_5 extends LinearOpMode {
             frontLeft.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y + gamepad1.left_stick_x) + gamepad1.right_stick_x));
             frontRight.setPower(drivePower * (driveDirection * (-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
             arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
-            //servo.setPosition(gamepad2.right_stick_y);
+            claw.setPosition(gamepad2.right_stick_y);
+            if (gamepad2.dpad_down) {
+                leftHook.setPosition(0);
+                rightHook.setPosition(0);
+            }
+            if (gamepad2.dpad_up) {
+                leftHook.setPosition(0.5);
+                rightHook.setPosition(0.5);
+            }
+           // CoachSchererVuforiaSkyStoneNavigation
         if(gamepad2.b){
             claw.setPosition(0);
         }
