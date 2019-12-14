@@ -29,7 +29,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Drive by Time and Power is used to estimate displacement
  * Standard servo claw from 0-1 positions
  * Standard servo hooks on the back of the bot from 0 to 0.5 positions
- * Standard servo blockThrower 
+ * Standard servo blockThrower
  *
  * Future versions should add
  *  drive by encoder
@@ -118,9 +118,9 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
 
         /**************************
          * Set block thrower servo values
-         */
+         **************************/
 
-        double blockThrowerUp = 0.5;
+        double blockThrowerUp = 0.33;
         double blockThrowerDown = 1.0;
         //Default Block Thrower Up
         blockThrower.setPosition(blockThrowerUp);
@@ -205,6 +205,7 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
              * Controller 1: Left Stick:  Forward, Backwards, Right and Left Rotate
              * Controller 1: Right Stick: Strafe Right and Left
              * Controller 1: Right Trigger: Boost Chassis Speed
+             * Controller 1: A, X, Y, B: Block Thrower
              *
              * Controller 2: Left Stick:  Arm Up & Down
              * Controller 2: Bumpers:     Arm bump up and down
@@ -256,11 +257,17 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
             */
 
             //Block Thrower
-            if(gamepad1.b){
+            if(gamepad1.a){
                 blockThrower.setPosition(blockThrowerDown);
+            }
+            if(gamepad1.b){
+                blockThrower.setPosition(0);
             }
             if(gamepad1.y){
                 blockThrower.setPosition(blockThrowerUp);
+            }
+            if(gamepad1.a){
+                blockThrower.setPosition(0.75);
             }
             //Hooks
             if (gamepad2.dpad_down) {
