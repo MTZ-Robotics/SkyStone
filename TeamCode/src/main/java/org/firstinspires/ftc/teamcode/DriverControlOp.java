@@ -11,18 +11,18 @@ import com.qualcomm.robotcore.hardware.Servo;
  *
  * Name should be short and descriptive
  *
- * Group should be one of the following:
- * Test - If it is dedicated to testing functionality of network or hardware or systems
- * Concept - If the opMode has not been validated
- * A_Top - If the OpMode is ready to use in competition
+ * Op Mode Group should be changed to one of the following:
+ *  Test - If it is dedicated to testing functionality of network or hardware or systems
+ *  Concept - If the opMode has not been validated
+ *  A_Top - If the OpMode is ready to use in competition
  *
- **************************************/
+ ************************************/
 
-@TeleOp(name="Concept Driver 11", group ="Concept")
+@TeleOp(name="DriverControlOp", group ="A_Top")
 
-/**********************************************
+/*************************************
  *
- * Driver 11
+ * Version 13
  *
  * Meccanum chassis with 0.5 motor speed factor with boost available
  * Arm uses a constant power to keep the arm in position while gravity tries to pull it down
@@ -50,15 +50,12 @@ import com.qualcomm.robotcore.hardware.Servo;
  *   Removed reverse and halfpower controls similar to version 7
  *   Changed claw control to use Right Stick same as version 7
  *
- *************************************************/
+ ************************************/
 
-/***
- * Comment out @Disabled below if you want it to show in the list of OpModes in the phone
- */
+//Comment out "@Disabled" below if you want it to show in the list of OpModes in the phone
 //@Disabled
 
-
-public class DriverControlOpMTZ_11 extends LinearOpMode {
+public class DriverControlOp extends LinearOpMode {
 
     //Determine variables for hardware to map to
     private DcMotor frontRight;
@@ -120,10 +117,10 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
          * Set block thrower servo values
          **************************/
 
-        double blockThrowerUp = 0.33;
+       /* double blockThrowerUp = 0.66;
         double blockThrowerDown = 1.0;
         //Default Block Thrower Up
-        blockThrower.setPosition(blockThrowerUp);
+        blockThrower.setPosition(blockThrowerUp);  */
 
         /************************************
          * Setting drive direction to 1
@@ -188,9 +185,15 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
             ***************************** End of power and reverse comment out  */
 
             /**********************
-             * Adjust DrivePower with Right Trigger
+             * Adjust DrivePower with Triggers
              */
-            drivePower = drivePower + gamepad1.right_trigger * (1 - defaultDrivePower);
+            if (gamepad1.right_trigger>0) {
+                drivePower = 0.5;
+            } else if (gamepad1.left_trigger>0) {
+                drivePower=0.25;
+                } else {
+                    drivePower = 0.6;
+                }
 
             /**********************************************
              * Output power values to driver station screen
@@ -225,7 +228,7 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
             arm.setPower((0.5*(gamepad2.left_stick_y)-0.2)* -1);
 
             //Arm Bump
-            if (gamepad2.left_bumper) {
+           /* if (gamepad2.left_bumper) {
                 arm.setPower(0);
                 sleep(100);
                 arm.setPower(0.2);
@@ -234,7 +237,7 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
                 arm.setPower(0.4);
                 sleep(100);
                 arm.setPower(0.2);
-            }
+            } */
 
             //Chassis Motor Powers
             backLeft.setPower(drivePower * (driveDirection * (gamepad1.right_stick_y + gamepad1.left_stick_x) - gamepad1.right_stick_x));
@@ -258,17 +261,12 @@ public class DriverControlOpMTZ_11 extends LinearOpMode {
 
             //Block Thrower
             if(gamepad1.a){
-                blockThrower.setPosition(blockThrowerDown);
-            }
-            if(gamepad1.b){
-                blockThrower.setPosition(0);
+                blockThrower.setPosition(0.66);
             }
             if(gamepad1.y){
-                blockThrower.setPosition(blockThrowerUp);
+                blockThrower.setPosition(1);
             }
-            if(gamepad1.a){
-                blockThrower.setPosition(0.75);
-            }
+
             //Hooks
             if (gamepad2.dpad_down) {
                 leftHook.setPosition(0);
