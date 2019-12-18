@@ -1,16 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name ="MoveForwardSlideRight")
+@Autonomous(name ="MatSlideLeft", group ="AA_Top")
 //@Disabled
 
-public class MoveForwardSlideRight extends LinearOpMode {
+public class MatSlideLeft extends LinearOpMode {
 
     DcMotor frontLeft;
     DcMotor frontRight;
@@ -18,6 +16,8 @@ public class MoveForwardSlideRight extends LinearOpMode {
     DcMotor backRight;
     DcMotor arm;
     Servo claw;
+    Servo rightHook;
+    Servo leftHook;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,11 +28,16 @@ public class MoveForwardSlideRight extends LinearOpMode {
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
         claw = hardwareMap.servo.get("claw");
+        rightHook = hardwareMap.servo.get("rightHook");
+        leftHook = hardwareMap.servo.get("leftHook");
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
+        leftHook.setDirection(Servo.Direction.REVERSE);
 
         claw.setPosition(0);
+        rightHook.setPosition(0.5);
+        leftHook.setPosition(0.5);
 
         arm.setPower(0.4);
         sleep(1000);
@@ -40,19 +45,27 @@ public class MoveForwardSlideRight extends LinearOpMode {
 
         waitForStart();
 
-        sleep(15000);
+        frontLeft.setPower(-0.3);
+        frontRight.setPower(-0.3);
+        backLeft.setPower(-0.3);
+        backRight.setPower(-0.3);
 
-        frontLeft.setPower(0.4);
-        frontRight.setPower(0.4);
-        backLeft.setPower(0.4);
-        backRight.setPower(0.4);
+        sleep(1000);
 
-        sleep(200);
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
 
-        frontLeft.setPower(0.4);
-        frontRight.setPower(-0.4);
-        backLeft.setPower(-0.4);
-        backRight.setPower(0.4);
+        leftHook.setPosition(0);
+        rightHook.setPosition(0);
+
+        sleep(2000);
+
+        frontLeft.setPower(0.3);
+        frontRight.setPower(0.3);
+        backLeft.setPower(0.3);
+        backRight.setPower(0.3);
 
         sleep(2000);
 
@@ -60,7 +73,22 @@ public class MoveForwardSlideRight extends LinearOpMode {
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
-        arm.setPower(0);
+
+        leftHook.setPosition(0.5);
+        rightHook.setPosition(0.5);
+
+        arm.setPower(0.1);
+
+        sleep(200);
+
+        arm.setPower(0.2);
+
+        frontLeft.setPower(0.3);
+        frontRight.setPower(-0.3);
+        backLeft.setPower(-0.3);
+        backRight.setPower(0.3);
+
+        sleep(1000);
 
     }
 }

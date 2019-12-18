@@ -35,7 +35,7 @@ public class MoveForwardSlideLeft extends LinearOpMode {
         claw.setPosition(0);
 
         arm.setPower(0.4);
-        sleep(400);
+        sleep(1000);
         arm.setPower(0.2);
 
         waitForStart();
@@ -47,7 +47,7 @@ public class MoveForwardSlideLeft extends LinearOpMode {
         backLeft.setPower(0.4);
         backRight.setPower(0.4);
 
-        sleep(1000);
+        sleep(200);
 
         frontLeft.setPower(-0.4);
         frontRight.setPower(0.4);
