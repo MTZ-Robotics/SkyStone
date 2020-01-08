@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="2 Red Build Zone Autonomous Op", group = "A_Top")
+@Autonomous(name ="4 Red Build Zone Autonomous Op", group = "A_Top")
 
 //@Disabled
 
-public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
+public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -27,7 +27,12 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
     private static final double pi = 3.1415;
     private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
 
-    private static final double defaultDriveSpeed = 0.25;
+    /**************
+     *
+     * Modify these speeds to help with diagnosing drive errors
+     *
+     */
+    private static final double defaultDriveSpeed = 0.95;
     private static final double defaultTurnSpeed = 0.25;
     private static final int defaultPauseTime = 1000;
 
@@ -35,6 +40,11 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
 
+        /**************
+         *
+         * Declare motors and servos
+         *
+         */
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
@@ -47,7 +57,10 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        arm.setDirection(DcMotor.Direction.REVERSE);
+        /**********
+         * Commenting out arm reverse to see if it will keep the arm in the correct direction
+         */
+        //arm.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
         claw.setPosition(0);
@@ -66,15 +79,13 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
         waitForStart();
 
         //Align Hooks With Foundation
+        //Drive(24,0.25, 100);
         Drive(24,defaultDriveSpeed, defaultPauseTime);
-        Drive(24,0.25, 1000);
-
-        /*****************
-         * Commenting out remaining path for troubleshooting motors
 
         Strafe(12,defaultDriveSpeed,defaultPauseTime);
         Turn(5,defaultTurnSpeed,defaultPauseTime);
         Drive(-4,defaultDriveSpeed,defaultPauseTime);
+
 
         //Hook Foundation
         HooksDown();
@@ -89,7 +100,6 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
         //Correct Angle and Park
         Turn(-2,defaultTurnSpeed,defaultPauseTime);
         Strafe(48,defaultDriveSpeed,defaultPauseTime);
-****************/
     }
 
 //Encoder Functions
@@ -224,7 +234,6 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
     }
 
 
-
     public void StopAndResetArmEncoder() {
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
@@ -232,7 +241,7 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void RaiseByInches(int distance) {
-        arm.setTargetPosition(distance * (int) conversionTicksToInches);
+        arm.setTargetPosition(distance * 45);
     }
     public void ArmPower(double power) {
         arm.setPower(power);
@@ -240,7 +249,7 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
 
     public void RaiseArm(int distance, double power, int pause) throws InterruptedException {
         //commenting out if opMode is active since it runs on initialize
-        if(opModeIsActive()) {
+        //if(opModeIsActive()) {
             //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             //arm.setTargetPosition(distance * (int) conversionTicksToInches);
             //arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -256,7 +265,7 @@ public class RedBuildZoneAutonomousOp2 extends LinearOpMode {
             //arm.setPower(0.2);
             ArmPower(0.2);
             Thread.sleep(pause);
-        }
+        //}
     }
 
     public void HooksDown() {
