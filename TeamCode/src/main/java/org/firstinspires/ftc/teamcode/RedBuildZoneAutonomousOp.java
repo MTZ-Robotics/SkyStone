@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name ="Red Build Zone Autonomous Op", group = "A_Top")
 
-//@Disabled
+@Disabled
 
 public class RedBuildZoneAutonomousOp extends LinearOpMode {
 

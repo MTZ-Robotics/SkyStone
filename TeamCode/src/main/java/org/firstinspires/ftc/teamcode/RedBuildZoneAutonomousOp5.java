@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -259,7 +260,8 @@ public class RedBuildZoneAutonomousOp5 extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         arm.setPower(0.4);
         //1000 ms = 14 inches
-        sleep(pause * 1000/14);
+        sleep(distance * 1000/14);
+        //sleep(1000);
         arm.setPower(0.2);
         Thread.sleep(pause);
     }
