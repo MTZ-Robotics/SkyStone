@@ -92,7 +92,7 @@ public class RightStrafeDriverControlOp extends LinearOpMode {
             }
 
             if(gamepad2.a){
-                blockThrower.setPosition(0.33);
+                blockThrower.setPosition(0.45);
             } else {
                 blockThrower.setPosition(1);
             }

@@ -2,15 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="4 Red Build Zone Autonomous Op", group = "A_Top")
+@Autonomous(name ="Red Build Zone Park Wall", group = "A_Top")
 
 //@Disabled
 
-public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
+public class RedBuildZoneParkWall6 extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -22,19 +21,20 @@ public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
     private Servo rightHook;
     private Servo blockThrower;
 
-    private static final double ticksPerRevolution = 1440;
-    private static final double gearReduction = 10.4;
+    private static final double ticksPerRevolution = 145.6;
+    private static final double gearReduction = 2.0;
     private static final double wheelDiameterInches = 4.0;
     private static final double pi = 3.1415;
     private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
+    private static final double experimentalInchesPerTurn = 91.8;
 
     /**************
      *
      * Modify these speeds to help with diagnosing drive errors
      *
      */
-    private static final double defaultDriveSpeed = 0.95;
-    private static final double defaultTurnSpeed = 0.25;
+    private static final double defaultDriveSpeed = 0.1;
+    private static final double defaultTurnSpeed = 0.1;
     private static final int defaultPauseTime = 1000;
 
     @Override
@@ -64,14 +64,16 @@ public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
         //arm.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
-        claw.setPosition(0);
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
-        blockThrower.setPosition(1);
 
         StopAndResetAllEncoders();
 
-        RaiseArm(3,0.35,defaultPauseTime);
+        /************
+         * Raise the arm to fit within 18" long dimension
+         */
+
+        RaiseArm(14,100);
 
         telemetry.log().clear();
         telemetry.update();
@@ -80,27 +82,36 @@ public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
         waitForStart();
 
         //Align Hooks With Foundation
-        //Drive(24,0.25, 100);
-        Drive(24,defaultDriveSpeed, defaultPauseTime);
-
-        Strafe(12,defaultDriveSpeed,defaultPauseTime);
-        Turn(5,defaultTurnSpeed,defaultPauseTime);
-        Drive(-4,defaultDriveSpeed,defaultPauseTime);
-
+        Drive(-24,0.12, 200);
+        Strafe(-12,0.12, 200);
+        Drive(-5,0.12,200);
 
         //Hook Foundation
         HooksDown();
 
         //Move Foundation to Build Zone
-        Drive(24,0.5,defaultPauseTime);
-        Turn(2,0.5,defaultPauseTime);
+        Drive(20,0.2,200);
+        Turn(40,0.2,200);
+        Drive (5,0.2,200);
+        Turn(80,0.2,200);
+        Strafe(5,0.2,200);
+        Drive(-12,0.1,200);
 
         //Unhook Foundation
         HooksUp();
 
-        //Correct Angle and Park
-        Turn(-2,defaultTurnSpeed,defaultPauseTime);
-        Strafe(48,defaultDriveSpeed,defaultPauseTime);
+        //Align to Park
+        Strafe(-12,0.1,200);
+        Drive(24,0.1,200);
+
+        //Lower arm gracefully
+        LowerArm(10,1000);
+
+        //Raise arm a little bit
+        RaiseArm(3,200);
+
+        //Park
+        Drive(14,0.1,0);
     }
 
 //Encoder Functions
@@ -134,22 +145,22 @@ public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
     public void DriveByInches(int distance) {
         frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
         frontRight.setTargetPosition(distance * (int) conversionTicksToInches);
-        backLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        backRight.setTargetPosition(distance * (int) conversionTicksToInches);
+        backLeft.setTargetPosition(-1 * distance * (int) conversionTicksToInches);
+        backRight.setTargetPosition(-1 * distance * (int) conversionTicksToInches);
     }
 
     public void StrafeByInches(int distance) {
         frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
         frontRight.setTargetPosition(-distance * (int) conversionTicksToInches);
-        backLeft.setTargetPosition(-distance * (int) conversionTicksToInches);
-        backRight.setTargetPosition(distance * (int) conversionTicksToInches);
-    }
-
-    public void TurnByInches(int distance) {
-        frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        frontRight.setTargetPosition(-distance * (int) conversionTicksToInches);
         backLeft.setTargetPosition(distance * (int) conversionTicksToInches);
         backRight.setTargetPosition(-distance * (int) conversionTicksToInches);
+    }
+
+    public void TurnByAngle(int degrees) {
+        frontLeft.setTargetPosition(degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
+        frontRight.setTargetPosition(-degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
+        backLeft.setTargetPosition(-degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
+        backRight.setTargetPosition(degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
     }
 
 
@@ -220,10 +231,10 @@ public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
         }
     }
 
-    public void Turn(int distance, double power, int pause) throws InterruptedException {
+    public void Turn(int degrees, double power, int pause) throws InterruptedException {
         if (opModeIsActive()) {
             StopAndResetDriveEncoders();
-            TurnByInches(distance);
+            TurnByAngle(degrees);
             RunDriveToPosition();
             DrivePower(power);
             while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
@@ -248,35 +259,36 @@ public class RedBuildZoneAutonomousOp4 extends LinearOpMode {
         arm.setPower(power);
     }
 
-    public void RaiseArm(int distance, double power, int pause) throws InterruptedException {
-        //commenting out if opMode is active since it runs on initialize
-        //if(opModeIsActive()) {
-            //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            //arm.setTargetPosition(distance * (int) conversionTicksToInches);
-            //arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            //arm.setPower(power);
-            StopAndResetArmEncoder();
-            RaiseByInches(distance);
-            RunArmToPosition();
-            ArmPower(power);
-            while (arm.isBusy()) {
-                DisplayArmTelemetry();
-            }
-            //arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            //arm.setPower(0.2);
-            ArmPower(0.2);
-            Thread.sleep(pause);
-        //}
+    public void RaiseArm(int distance, int pause) throws InterruptedException {
+        /**********
+         * Use time based arm controls since the arm falls when the target distance is reached
+         */
+
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setPower(0.4);
+        //1000 ms = 12 inches
+        sleep(distance * 1000/12);
+        //sleep(1000);
+        arm.setPower(0.2);
+        Thread.sleep(pause);
     }
 
+    public void LowerArm(int distance, int pause) throws InterruptedException {
+        arm.setPower(0.1);
+        sleep(distance * 100);
+        arm.setPower(0);
+        Thread.sleep(pause);
+    }
     public void HooksDown() {
         leftHook.setPosition(0);
         rightHook.setPosition(0);
+        sleep(1500);
     }
 
     public void HooksUp() {
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
+        sleep(1500);
     }
 
 }
