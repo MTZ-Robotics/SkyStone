@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+
+
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,6 +21,9 @@ public class z_Test_Timer extends LinearOpMode {
     boolean greenTimerElapsed;
     boolean yellowTimerElapsed;
     boolean redTimerElapsed;
+
+
+
 
     @Override
 
@@ -71,5 +77,6 @@ public class z_Test_Timer extends LinearOpMode {
                 .addData("Red Timer Elapsed: ", redTimerElapsed);
         telemetry.update();
     }
+
 
 }
