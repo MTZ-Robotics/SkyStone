@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="Blue Build Zone Park Bridge", group = "A_Top")
+@Autonomous(name ="Blue Quarry Wall", group = "A_Top")
 
 //@Disabled
 

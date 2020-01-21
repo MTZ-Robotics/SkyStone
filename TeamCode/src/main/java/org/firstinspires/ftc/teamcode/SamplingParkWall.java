@@ -28,7 +28,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-@Autonomous(name ="SamplingParkWall", group = "A_Top")
+@Autonomous(name ="Red Sampling Quarry Park Wall", group = "A_Top")
 
 //@Disabled
 
@@ -51,20 +51,17 @@ public class SamplingParkWall extends LinearOpMode {
     private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
     private static final double conversionTicksToDegrees = (experimentalInchesPerTurn * conversionTicksToInches) / 360;
 
-    //Vuforia variables
+    //Vuforia TEAM SPECIFIC variables
     final String VUFORIA_KEY = "\"AVqjUTL/////AAABmVnL+WsLRESmq47kooHwhcJo8agx+2Neapzf8VeCj/x+/y9bqF44lkQ1eOLU27J34UG8/9iN72gzW5VvpKwWCR1Cyy1IJ5QeGbgTsz9cZK8QllKDQfZOLJCMjF8om2XkeQMmxIn0ubjUfvzwM1ssaWOorEZYz0EmixrWeCJuoCt2yGWsm547w1By5sLacPmLnQf/s489lw29ibFtG8I7QkGJtUVH8T8LD+efsS/ZEKDIeaX/E+uZz5Zr0vI9EFDrC9bMRGPWHeN7TDBAFwyDDFzVe9hIo9PKaUYFe8zIMElRIsKcWyfCyAhg6+ZJ8F4qgfd+z2seDb/zMesVuWbnd0byStsK5w00TjK8/pPqJmiz";
     final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
     final boolean PHONE_IS_PORTRAIT = false;
+    final float CAMERA_FORWARD_DISPLACEMENT  = 0;
+    final float CAMERA_VERTICAL_DISPLACEMENT = 0;
+    final float CAMERA_LEFT_DISPLACEMENT     = 0;
+
+    //Vuforia calculation variables
     final float mmPerInch = 25.4f;
-    final float mmTargetHeight = (6) * mmPerInch;
     final float stoneZ = 2.00f * mmPerInch;
-    final float bridgeZ = 6.42f * mmPerInch;
-    final float bridgeY = 23 * mmPerInch;
-    final float bridgeX = 5.18f * mmPerInch;
-    final float bridgeRotY = 59;
-    final float bridgeRotZ = 180;
-    final float halfField = 72 * mmPerInch;
-    final float quadField  = 36 * mmPerInch;
     OpenGLMatrix lastLocation = null;
     VuforiaLocalizer vuforia = null;
     boolean targetVisible = false;
@@ -76,7 +73,9 @@ public class SamplingParkWall extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
 
-        //Hardware mapping
+        telemetry.addData("Hardware Status", "Initializing...");
+        telemetry.update();
+
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
@@ -84,7 +83,6 @@ public class SamplingParkWall extends LinearOpMode {
         arm = hardwareMap.dcMotor.get("arm");
         claw = hardwareMap.servo.get("claw");
 
-        //Set hardware direction
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
@@ -92,6 +90,7 @@ public class SamplingParkWall extends LinearOpMode {
 
         RaiseArm(14,100);
 
+        telemetry.addData("Hardware Status", "Ready!");
         telemetry.addData("Vuforia Status", "Initializing...");
         telemetry.update();
 
@@ -133,58 +132,10 @@ public class SamplingParkWall extends LinearOpMode {
         rear2.setName("Rear Perimeter 2");
 
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(targetsSkyStone);
+        allTrackables.add(stoneTarget);
 
         stoneTarget.setLocation(OpenGLMatrix
                 .translation(0, 0, stoneZ)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
-
-        blueFrontBridge.setLocation(OpenGLMatrix
-                .translation(-bridgeX, bridgeY, bridgeZ)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, bridgeRotY, bridgeRotZ)));
-
-        blueRearBridge.setLocation(OpenGLMatrix
-                .translation(-bridgeX, bridgeY, bridgeZ)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, -bridgeRotY, bridgeRotZ)));
-
-        redFrontBridge.setLocation(OpenGLMatrix
-                .translation(-bridgeX, -bridgeY, bridgeZ)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, -bridgeRotY, 0)));
-
-        redRearBridge.setLocation(OpenGLMatrix
-                .translation(bridgeX, -bridgeY, bridgeZ)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 0, bridgeRotY, 0)));
-
-        red1.setLocation(OpenGLMatrix
-                .translation(quadField, -halfField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180)));
-
-        red2.setLocation(OpenGLMatrix
-                .translation(-quadField, -halfField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 180)));
-
-        front1.setLocation(OpenGLMatrix
-                .translation(-halfField, -quadField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , 90)));
-
-        front2.setLocation(OpenGLMatrix
-                .translation(-halfField, quadField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90)));
-
-        blue1.setLocation(OpenGLMatrix
-                .translation(-quadField, halfField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0)));
-
-        blue2.setLocation(OpenGLMatrix
-                .translation(quadField, halfField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0)));
-
-        rear1.setLocation(OpenGLMatrix
-                .translation(halfField, quadField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , -90)));
-
-        rear2.setLocation(OpenGLMatrix
-                .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
         if (CAMERA_CHOICE == BACK) {
@@ -197,10 +148,6 @@ public class SamplingParkWall extends LinearOpMode {
             phoneXRotate = 90 ;
         }
 
-        final float CAMERA_FORWARD_DISPLACEMENT  = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
-        final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
-        final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
-
         OpenGLMatrix robotFromCamera = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
@@ -208,6 +155,15 @@ public class SamplingParkWall extends LinearOpMode {
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
+
+        telemetry.clearAll();
+        telemetry.log().add("System Ready. Press Play to Begin!");
+        telemetry.update();
+
+        waitForStart();
+
+        Strafe(-24,0.12,200);
+        Drive(-24,0.12,200);
 
         while (!isStopRequested()) {
             targetVisible = false;
@@ -222,14 +178,10 @@ public class SamplingParkWall extends LinearOpMode {
                     break;
                 }
             }
-
             if (targetVisible) {
-                // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-
-                // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
             } else {
@@ -238,15 +190,6 @@ public class SamplingParkWall extends LinearOpMode {
             telemetry.update();
         }
 
-        telemetry.addData("Vuforia Status", "Ready!");
-
-        telemetry.clear();
-        telemetry.update();
-        telemetry.log().add("System Ready. Press Play to Begin!");
-
-        waitForStart();
-
-        targetsSkyStone.deactivate();
     }
 
 //Encoder Functions

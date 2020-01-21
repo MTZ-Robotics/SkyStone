@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Test Sounds", group="z_test")
-//@Disabled
+@Disabled
 public class z_test_sounds extends LinearOpMode {
 
     // List of available sound resources
@@ -65,8 +65,8 @@ public class z_test_sounds extends LinearOpMode {
         // Variables for choosing from the available sounds
         int     soundIndex      = 0;
         int     soundID         = -1;
-        boolean was_dpad_up     = false;
-        boolean was_dpad_down   = false;
+        //boolean was_dpad_up     = false;
+        //boolean was_dpad_down   = false;
 
         Context myApp = hardwareMap.appContext;
 
@@ -77,7 +77,7 @@ public class z_test_sounds extends LinearOpMode {
 
         // In this sample, we will skip waiting for the user to press play, and start displaying sound choices right away
         while (!isStopRequested()) {
-
+/*
             // Look for DPAD presses to change the selection
             if (gamepad1.dpad_down && !was_dpad_down) {
                 // Go to next sound (with list wrap) and display it
@@ -88,10 +88,15 @@ public class z_test_sounds extends LinearOpMode {
                 // Go to previous sound (with list wrap) and display it
                 soundIndex = (soundIndex + sounds.length - 1) % sounds.length;
             }
-
+*/
             // Look for trigger to see if we should play sound
             // Only start a new sound if we are currently not playing one.
-            if (gamepad1.right_bumper && !soundPlaying) {
+            //if (gamepad1.right_bumper && !soundPlaying) {
+
+            // Go to next sound (with list wrap) and display it
+            soundIndex = (soundIndex + 1) % sounds.length;
+
+            if (!soundPlaying) {
 
                 // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
                 if ((soundID = myApp.getResources().getIdentifier(sounds[soundIndex], "raw", myApp.getPackageName())) != 0){
@@ -105,17 +110,18 @@ public class z_test_sounds extends LinearOpMode {
                                 public void run() {
                                     soundPlaying = false;
                                 }} );
+
                 }
             }
-
+/*
             // Remember the last state of the dpad to detect changes.
             was_dpad_up     = gamepad1.dpad_up;
             was_dpad_down   = gamepad1.dpad_down;
-
+*/
             // Display the current sound choice, and the playing status.
-            telemetry.addData("", "Use DPAD up/down to choose sound.");
-            telemetry.addData("", "Press Right Bumper to play sound.");
-            telemetry.addData("", "");
+            //telemetry.addData("", "Use DPAD up/down to choose sound.");
+            //telemetry.addData("", "Press Right Bumper to play sound.");
+            //telemetry.addData("", "");
             telemetry.addData("Sound >", sounds[soundIndex]);
             telemetry.addData("Status >", soundPlaying ? "Playing" : "Stopped");
             telemetry.update();

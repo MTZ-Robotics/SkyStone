@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Test Arm E C W", group = "z_test")
+@TeleOp(name = "Test Claw Close", group = "z_test")
 
 //@Disabled              // Comment out to allow this OpMode to display in phone
 
-public class z_test_arm_ewc extends LinearOpMode {
+public class z_test_claw_close extends LinearOpMode {
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -136,6 +136,16 @@ public class z_test_arm_ewc extends LinearOpMode {
             //old arm power  arm.setPower(armPower * (gamepad2.left_stick_y) - 0.2);
             arm.setPower(armPower * gamepad2.left_stick_y);
             armExtension.setPower(armExtensionPower * gamepad2.left_stick_x);
+
+            //raise arm slowly
+            //armExtension.setPower(-1);
+            //lower arm slowly
+            //arm.setPower(0.7);
+            claw.setPosition(claw.getPosition()+0.01);
+            //wait(1000);
+
+
+
 
 
             /***********
