@@ -206,14 +206,14 @@ public class TeleLeftStrafeDriverTest2 extends LinearOpMode {
              * Arm Controls
              *************/
 
-            arm.setPower(armPower * (gamepad2.right_stick_y) - 0.2);
+            arm.setPower(armPower * (gamepad2.left_stick_y) - 0.2);
 
 
             /*************
              * Claw Controls
              *************/
 
-            claw.setPosition(gamepad2.left_stick_y);
+            claw.setPosition(gamepad2.right_stick_y);
 
 
 
