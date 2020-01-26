@@ -5,20 +5,19 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.ftccommon.SoundPlayer;
-//import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Left Strafe Test", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls", group ="A_Top")
 
 //@Disabled
 
-public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
+public class TeleMTZ_Drive_Controls extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -28,16 +27,22 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
     double greenWarningTime;
     double yellowWarningTime;
     double redWarningTime;
-    double endTime;
+    double endGameStart;
+    double endGameOver;
+    double endGameWarning;
     boolean greenTimerElapsed;
     boolean yellowTimerElapsed;
     boolean redTimerElapsed;
-    boolean endTimerElapsed;
+    boolean endGameStartElapsed;
     View relativeLayout;
-    String  sounds[] =  {"ss_alarm", "ss_bb8_down", "ss_bb8_up", "ss_darth_vader", "ss_fly_by",
-            "ss_mf_fail", "ss_laser", "ss_laser_burst", "ss_light_saber", "ss_light_saber_long", "ss_light_saber_short",
-            "ss_light_speed", "ss_mine", "ss_power_up", "ss_r2d2_up", "ss_roger_roger", "ss_siren", "ss_wookie" };
-    boolean soundPlaying = false;
+
+    /***********
+     * Lights Control Declarations
+     ***********/
+
+    RevBlinkinLedDriver blinkinLedDriver;
+    RevBlinkinLedDriver.BlinkinPattern pattern;
+
 
     /*************************
      * Motor & Servo Variables
@@ -51,24 +56,45 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
+    //private Servo blinkin;
 
     double drivePower;
     double armPower;
-    double defaultDrivePower;
-    boolean rightStrafe;
+    double defaultArmPower;
+
+    //boolean rightStrafe;
 
     @Override
 
+    //This is the opMode call for generically running the opMode in this super class
     public void runOpMode() {
+
+        boolean rightStrafer = true;
+        boolean spurGearArm = true;
+        double driveSpeed = 0.5;
+        telemetry.log().add("Strafe Right:"+rightStrafer+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
+        controlRobot(rightStrafer,spurGearArm,driveSpeed);
+    }
+
+    //This is the method that handles the controls
+    public void controlRobot(Boolean strafeWithRight, Boolean supportArm, Double defaultDrivePower){
+
+        boolean rightStrafe = strafeWithRight;
+        boolean accountForArmDrift = supportArm;
+
         /***********************
          * Modifiable variables
          **********************/
-        rightStrafe = false;
-        endTime = 105;
-        greenWarningTime = 60;
-        yellowWarningTime = 70;
-        redWarningTime = 80;
-        defaultDrivePower = 0.5;
+        //rightStrafe = false;
+        endGameStart = 15;
+        endGameWarning = endGameStart + 15;
+        endGameOver = endGameStart + 30;
+        greenWarningTime = 3;
+        yellowWarningTime = 6;
+        redWarningTime = 9;
+        //defaultDrivePower = 0.5;
+        defaultArmPower = 0.35;
+
 
 
         /***************
@@ -77,18 +103,16 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
         greenTimerElapsed = false;
         yellowTimerElapsed = false;
         redTimerElapsed = false;
-        endTimerElapsed = false;
-        // Get a reference to the RelativeLayout so we can later change the background
-        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
-        relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-        Context myApp = hardwareMap.appContext;
-        // Variables for choosing from the available sounds
-        int     soundIndex      = 0;
-        int     soundID         = -1;
-        // create a sound parameter that holds the desired player parameters.
-        SoundPlayer.PlaySoundParams params = new SoundPlayer.PlaySoundParams();
-        params.loopControl = 0;
-        params.waitForNonLoopingSoundsToFinish = true;
+        endGameStartElapsed = false;
+
+        /*************
+         * Set Lights Variables
+         *************/
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+
+        pattern = RevBlinkinLedDriver.BlinkinPattern.DARK_RED;
+        blinkinLedDriver.setPattern(pattern);
+
 
         /*******************************
          * Set Motor & Servo Variables
@@ -110,28 +134,24 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
         arm.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
-
-
         /**********************************
          * Set positions on initialize
          **********************************/
-
 
         claw.setPosition(0);
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
 
-
-
         /***********************************************
          * Tell driver station that initialization complete
          **********************************************/
         telemetry.log().add("Initialized. Go MTZ! Timer Set for ");
+
         telemetry.log().add(Double.toString(greenWarningTime)+" s, " +
                 Double.toString(yellowWarningTime)+" s, " +
                 Double.toString(redWarningTime)+" s, " +
-                Double.toString(endTime)+" s, "
+                Double.toString(endGameStart)+" s, "
         );
 
         /************* Press Play Button ***********************/
@@ -191,28 +211,39 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
             }
 
 
-            /* Don't need to adjust arm speed
+            /*************
+             * Arm Controls
+             *************/
+
+            /*
+
             if (gamepad2.right_trigger > 0) {
+
                 armPower = 0.5;
             } else if (gamepad2.left_trigger > 0) {
                 armPower = 0.2;
             } else {
                 armPower = 0.35;
             }
-            */
+             */
 
-            /*************
-             * Arm Controls
-             *************/
+            armPower = defaultArmPower;
 
-            arm.setPower(armPower * (gamepad2.right_stick_y) - 0.2);
+
+            if (accountForArmDrift) {
+
+                arm.setPower( armPower * (gamepad2.left_stick_y) - 0.2 );
+            } else {
+
+                arm.setPower( armPower * (gamepad2.left_stick_y) );
+            }
 
 
             /*************
              * Claw Controls
              *************/
 
-            claw.setPosition(gamepad2.left_stick_y);
+            claw.setPosition(gamepad2.right_stick_y);
 
 
 
@@ -231,80 +262,43 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
              * Check if timer has elapsed
              *********************************/
             //Check for End Timer First
-            if (endGameTimer.seconds()>endTime){
-                endTimerElapsed = true;
-                /******** Select & Play Sound**************/
-                soundIndex = 16; //Select Sound
-                //Play sound if a sound has finished playing
-                if (!soundPlaying) {
-                    // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
-                    if ((soundID = myApp.getResources().getIdentifier(sounds[soundIndex], "raw", myApp.getPackageName())) != 0){
-                        // Signal that the sound is now playing.
-                        soundPlaying = true;
-                        // Start playing, and also Create a callback that will clear the playing flag when the sound is complete.
-                        SoundPlayer.getInstance().startPlaying(myApp, soundID, params, null,
-                                new Runnable() {
-                                    public void run() {
-                                        soundPlaying = false;
-                                    }} );
-                    }
-                }
+            // Another variable time is included in OpMode
+            if (endGameTimer.seconds()>endGameOver){
+                endGameStartElapsed = true;
+
+                pattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
+                blinkinLedDriver.setPattern(pattern);
+                alertWhite();
+            } else if (endGameTimer.seconds()>endGameWarning){
+                endGameStartElapsed = true;
+
+                pattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
+                blinkinLedDriver.setPattern(pattern);
+                alertWhite();
+            } else if (endGameTimer.seconds()>endGameStart){
+                endGameStartElapsed = true;
+
+                pattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
+                blinkinLedDriver.setPattern(pattern);
                 alertWhite();
             } else if (endGameTimer.seconds()>redWarningTime){ //Then check for red
                 redTimerElapsed = true;
-                /******** Select & Play Sound**************/
-                soundIndex = 7; //Select Sound
-                //Play sound if a sound has finished playing
-                if (!soundPlaying) {
-                    // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
-                    if ((soundID = myApp.getResources().getIdentifier(sounds[soundIndex], "raw", myApp.getPackageName())) != 0){
-                        // Signal that the sound is now playing.
-                        soundPlaying = true;
-                        // Start playing, and also Create a callback that will clear the playing flag when the sound is complete.
-                        SoundPlayer.getInstance().startPlaying(myApp, soundID, params, null,
-                                new Runnable() {
-                                    public void run() {
-                                        soundPlaying = false;
-                                    }} );
-                    }
-                }
+
+                pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                blinkinLedDriver.setPattern(pattern);
                 alertRed();
             } else if (endGameTimer.seconds()>yellowWarningTime){ //Then check for yellow
                 yellowTimerElapsed = true;
-                /******** Select & Play Sound**************/
-                soundIndex = 9; //Select Sound
-                //Play sound if a sound has finished playing
-                if (!soundPlaying) {
-                    // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
-                    if ((soundID = myApp.getResources().getIdentifier(sounds[soundIndex], "raw", myApp.getPackageName())) != 0){
-                        soundPlaying = true; // Signal that the sound is now playing.
-                        // Start playing, and also Create a callback that will clear the playing flag when the sound is complete.
-                        SoundPlayer.getInstance().startPlaying(myApp, soundID, params, null,
-                                new Runnable() {
-                                    public void run() {
-                                        soundPlaying = false;
-                                    }} );
-                    }
-                }
+
+                pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                blinkinLedDriver.setPattern(pattern);
                 alertYellow();
             } else if (endGameTimer.seconds()>greenWarningTime){ //Then check for green
                 greenTimerElapsed = true;
-                /******** Select & Play Sound**************/
-                soundIndex = 0; //Select Sound
-                //Play sound if a sound has finished playing
-                if (!soundPlaying) {
-                    // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
-                    if ((soundID = myApp.getResources().getIdentifier(sounds[soundIndex], "raw", myApp.getPackageName())) != 0){
-                        soundPlaying = true; // Signal that the sound is now playing.
-                        // Start playing, and also Create a callback that will clear the playing flag when the sound is complete.
-                        SoundPlayer.getInstance().startPlaying(myApp, soundID, params, null,
-                                new Runnable() {
-                                    public void run() {
-                                        soundPlaying = false;
-                                    }} );
-                    }
-                }
+
                 alertGreen();
+                pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                blinkinLedDriver.setPattern(pattern);
             }
 
         }
@@ -312,7 +306,8 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
 
     public void displayTelemetry() {
         telemetry.clearAll();
-
+        telemetry.addLine()
+                .addData("Timer: ", endGameTimer.toString());
         telemetry.addLine()
                 .addData("Front Left Power: ", frontLeft.getPower());
         telemetry.addLine()
@@ -331,10 +326,6 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
                 .addData("Right Hook Position: ", rightHook.getPosition());
         telemetry.addLine()
                 .addData("Block Thrower Position: ", blockThrower.getPosition());
-
-
-        telemetry.addLine()
-                .addData("Timer: ", endGameTimer.toString());
         telemetry.update();
     }
 
@@ -345,6 +336,7 @@ public class TeleLeftStrafeDriverControlOp extends LinearOpMode {
                 relativeLayout.setBackgroundColor(Color.GREEN);
             }
         });
+
     }
     public void alertYellow(){
         //driver station background yellow
