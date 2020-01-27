@@ -93,7 +93,7 @@ public class AutoControlsMTZ extends LinearOpMode {
 
         if (pathToRun=="FoundationBridge") {
 
-            telemetry.log().add("Robot should face towards wall centered in tile next to bridge");
+            telemetry.log().add("Robot should face towards wall centered in tile next to bridge.");
 
             waitForStart();
 

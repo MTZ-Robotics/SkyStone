@@ -95,8 +95,6 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         //defaultDrivePower = 0.5;
         defaultArmPower = 0.35;
 
-
-
         /***************
          * Set Timer Variables
          ***************/
@@ -110,14 +108,12 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
          *************/
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        pattern = RevBlinkinLedDriver.BlinkinPattern.DARK_RED;
+        pattern = RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED;
         blinkinLedDriver.setPattern(pattern);
-
 
         /*******************************
          * Set Motor & Servo Variables
          ******************************/
-
 
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
@@ -158,6 +154,9 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
 
         waitForStart();
 
+        pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+        blinkinLedDriver.setPattern(pattern);
+
         //Start timer here since play was just pressed
         endGameTimer = new ElapsedTime();
         endGameTimer.reset();
@@ -181,7 +180,6 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
              * Hook Controls
              ****************/
 
-
             if (gamepad2.dpad_down) {
                 leftHook.setPosition(0);
                 rightHook.setPosition(0);
@@ -192,7 +190,6 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 leftHook.setPosition(0.5);
                 rightHook.setPosition(0.5);
             }
-
 
             /*************************
              * Chassis drive controls
@@ -210,11 +207,9 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 frontRight.setPower(drivePower * ((-gamepad1.right_stick_y - gamepad1.left_stick_x) - gamepad1.right_stick_x));
             }
 
-
             /*************
              * Arm Controls
              *************/
-
             /*
 
             if (gamepad2.right_trigger > 0) {
@@ -238,14 +233,11 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 arm.setPower( armPower * (gamepad2.left_stick_y) );
             }
 
-
             /*************
              * Claw Controls
              *************/
 
             claw.setPosition(gamepad2.right_stick_y);
-
-
 
             /************************
              * Cap Stone thrower controls
@@ -257,50 +249,35 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 blockThrower.setPosition(1);
             }
 
-
             /*********************************
              * Check if timer has elapsed
              *********************************/
             //Check for End Timer First
-            // Another variable time is included in OpMode
             if (endGameTimer.seconds()>endGameOver){
                 endGameStartElapsed = true;
-
-                pattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
                 blinkinLedDriver.setPattern(pattern);
-                alertWhite();
             } else if (endGameTimer.seconds()>endGameWarning){
                 endGameStartElapsed = true;
-
-                pattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
-                blinkinLedDriver.setPattern(pattern);
-                alertWhite();
-            } else if (endGameTimer.seconds()>endGameStart){
-                endGameStartElapsed = true;
-
-                pattern = RevBlinkinLedDriver.BlinkinPattern.TWINKLES_RAINBOW_PALETTE;
-                blinkinLedDriver.setPattern(pattern);
-                alertWhite();
-            } else if (endGameTimer.seconds()>redWarningTime){ //Then check for red
-                redTimerElapsed = true;
-
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
                 blinkinLedDriver.setPattern(pattern);
-                alertRed();
+            } else if (endGameTimer.seconds()>endGameStart){
+                endGameStartElapsed = true;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+                blinkinLedDriver.setPattern(pattern);
+            } else if (endGameTimer.seconds()>redWarningTime){ //Then check for red
+                redTimerElapsed = true;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                blinkinLedDriver.setPattern(pattern);
             } else if (endGameTimer.seconds()>yellowWarningTime){ //Then check for yellow
                 yellowTimerElapsed = true;
-
                 pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
                 blinkinLedDriver.setPattern(pattern);
-                alertYellow();
             } else if (endGameTimer.seconds()>greenWarningTime){ //Then check for green
                 greenTimerElapsed = true;
-
-                alertGreen();
                 pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
                 blinkinLedDriver.setPattern(pattern);
             }
-
         }
     }
 
@@ -328,40 +305,4 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 .addData("Block Thrower Position: ", blockThrower.getPosition());
         telemetry.update();
     }
-
-    public void alertGreen(){
-        //driver station background green
-        relativeLayout.post(new Runnable() {
-            public void run() {
-                relativeLayout.setBackgroundColor(Color.GREEN);
-            }
-        });
-
-    }
-    public void alertYellow(){
-        //driver station background yellow
-        relativeLayout.post(new Runnable() {
-            public void run() {
-                relativeLayout.setBackgroundColor(Color.YELLOW);
-            }
-        });
-    }
-    public void alertRed(){
-        //driver station background red
-        relativeLayout.post(new Runnable() {
-            public void run() {
-                relativeLayout.setBackgroundColor(Color.RED);
-            }
-        });
-    }
-    public void alertWhite(){
-        //driver station background White
-        relativeLayout.post(new Runnable() {
-            public void run() {
-                relativeLayout.setBackgroundColor(Color.WHITE);
-            }
-        });
-    }
-
-
 }
