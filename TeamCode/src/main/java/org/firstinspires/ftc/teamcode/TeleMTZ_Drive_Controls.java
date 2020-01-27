@@ -52,6 +52,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
+    private DcMotor armExtension;
     private Servo claw;
     private Servo leftHook;
     private Servo rightHook;
@@ -85,15 +86,13 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         /***********************
          * Modifiable variables
          **********************/
-        //rightStrafe = false;
-        endGameStart = 15;
+        endGameStart = 90;
         endGameWarning = endGameStart + 15;
         endGameOver = endGameStart + 30;
-        greenWarningTime = 3;
-        yellowWarningTime = 6;
-        redWarningTime = 9;
-        //defaultDrivePower = 0.5;
-        defaultArmPower = 0.35;
+        greenWarningTime = 60;
+        yellowWarningTime = 70;
+        redWarningTime = 80;
+        defaultArmPower = 0.75;
 
         /***************
          * Set Timer Variables
@@ -120,6 +119,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
+        arm = hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
@@ -128,6 +128,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         arm.setDirection(DcMotor.Direction.REVERSE);
+        armExtension.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
         /**********************************
@@ -232,6 +233,8 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
 
                 arm.setPower( armPower * (gamepad2.left_stick_y) );
             }
+
+            armExtension.setPower((gamepad2.left_stick_x));
 
             /*************
              * Claw Controls

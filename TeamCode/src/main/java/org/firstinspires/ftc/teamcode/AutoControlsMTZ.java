@@ -97,9 +97,9 @@ public class AutoControlsMTZ extends LinearOpMode {
 
         if (alliance=="Blue") {
 
-            pattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_BLUE;
+            pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE;
         } else if (alliance=="Red") {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED;
+            pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
         }
         blinkinLedDriver.setPattern(pattern);
 
