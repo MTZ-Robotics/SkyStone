@@ -316,7 +316,7 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                 Drive(48,defaultDriveSpeed,defaultPauseTime);
 
             }
-            else if(pathToRun=="DepotSampleAudienceWall"){
+            else if (pathToRun=="DepotSampleAudienceWall"){
 
                 /************************************
                  * Path set up -- Add to each path
@@ -344,9 +344,37 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
 
                 alignToSkyStone();
 
+            } else {
+
+                /************************************
+                 * Path set up -- Add to each path
+                 ***********************************/
+
+                //Robot Setup Notes
+                telemetry.log().add("Error in Path Selection");
+
+                waitForStart();
+
+                //Turn lights off
+                if (alliance=="Blue") {
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
+                } else if (alliance=="Red") {
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
+                }
+                blinkinLedDriver.setPattern(pattern);
+
+                /************
+                 * Path Start
+                 ************/
+                sleep(30000);
+
             }
         }
     }
+
+    /**************************************
+     * End of Paths
+     **************************************/
 
     //Path Methods
     public void goToFoundationfromWall(int allianceReverser) throws InterruptedException{
