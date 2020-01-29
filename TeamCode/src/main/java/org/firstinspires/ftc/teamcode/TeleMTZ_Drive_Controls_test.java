@@ -1,23 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls test", group ="A_Top")
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_test extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -57,7 +53,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
-    //private Servo wrist;
+    private Servo wrist;
     //private Servo blinkin;
 
     double drivePower;
@@ -72,7 +68,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
     public void runOpMode() {
 
         boolean rightStrafer = true;
-        boolean spurGearArm = false;
+        boolean spurGearArm = true;
         double driveSpeed = 0.5;
         telemetry.log().add("Strafe Right:"+rightStrafer+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
         controlRobot(rightStrafer,spurGearArm,driveSpeed);
@@ -122,7 +118,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         arm = hardwareMap.dcMotor.get("arm");
         armExtension = hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
-        //wrist = hardwareMap.servo.get("wrist");
+        wrist = hardwareMap.servo.get("wrist");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
@@ -141,7 +137,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
-        //wrist.setPosition(0);
+        wrist.setPosition(0);
 
         /***********************************************
          * Tell driver station that initialization complete
@@ -249,7 +245,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
              * Wrist Controls
              *************/
 
-            //wrist.setPosition(gamepad2.right_stick_x);
+            wrist.setPosition(gamepad2.right_stick_x);
 
             /************************
              * Cap Stone thrower controls
@@ -311,8 +307,8 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 .addData("Arm Extender Power: ", armExtension.getPower());
         telemetry.addLine()
                 .addData("Claw Position: ", claw.getPosition());
-        //telemetry.addLine()
-        //        .addData("Wrist Position: ", wrist.getPosition());
+        telemetry.addLine()
+                .addData("Wrist Position: ", wrist.getPosition());
         telemetry.addLine()
                 .addData("Left Hook Position: ", leftHook.getPosition());
         telemetry.addLine()

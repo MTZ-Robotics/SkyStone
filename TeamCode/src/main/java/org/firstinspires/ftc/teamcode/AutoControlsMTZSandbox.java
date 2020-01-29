@@ -6,11 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="Auto Controls", group = "z_test")
+@Autonomous(name ="Auto Controls Test 2", group = "z_test")
 
 //@Disabled
 
-public class AutoControlsMTZ extends LinearOpMode {
+public class AutoControlsMTZSandbox extends LinearOpMode {
 
 
     /**************
@@ -21,6 +21,7 @@ public class AutoControlsMTZ extends LinearOpMode {
     private static final double defaultDriveSpeed = 0.2;
     private static final double defaultTurnSpeed = 0.4;
     private static final int defaultPauseTime = 200;
+
 
     /**********************
      * These variables are the constants in path commands
@@ -56,8 +57,11 @@ public class AutoControlsMTZ extends LinearOpMode {
 
     @Override
 
+    /********************************
+     * Default opMode Settings       *******
+     ********************************/
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","FoundationWall",false);
+        autoPaths("Blue","DepotWall",false);
 
     }
 
@@ -182,7 +186,7 @@ public class AutoControlsMTZ extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Robot starts facing quarry on intersection between tiles one tile away from bridge line.");
+            telemetry.log().add("Robot is using Depot Wall v0.1");
 
             waitForStart();
 
@@ -198,24 +202,41 @@ public class AutoControlsMTZ extends LinearOpMode {
              * Path Start
              ************/
 
-            //Wait 15 seconds
-            sleep(15000);
-
-            if (pathToRun=="DepotWall"){
+            if (pathToRun=="DepotWall") {
                 //Move forward slightly
-                Drive(1,defaultDriveSpeed,defaultPauseTime);
-            } else {
-                //Move forward more
-                Drive(12,defaultDriveSpeed,defaultPauseTime);
+                /***********************************
+                 * This code has not yet been tested
+                 ***********************************/
+                Drive(1, defaultDriveSpeed, defaultPauseTime);
+
+                //Strafe right towards first block in line
+                Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
+
+                //Move toward first block in line
+                Drive(20, defaultDriveSpeed, defaultPauseTime);
+
+                //Lower arm
+                LowerArm(7 ,defaultPauseTime);
+
+                //Close claw to grab block
+                claw.setPosition(1);
+
+                //Raise arm slightly
+                RaiseArm(2,defaultPauseTime);
+
+                //Reverse
+                Drive(-24,defaultDriveSpeed,defaultPauseTime);
+
+                //Turn towards line
+                Turn(allianceReverser * -90,0.1,defaultPauseTime);
+
+                //Drive past line with block
+                Drive(48,defaultDriveSpeed,defaultPauseTime);
+
             }
+            else {
 
-            //Lower arm
-            LowerArm(10,defaultPauseTime*2);
-            RaiseArm(3,defaultPauseTime);
-
-            //Park
-            Strafe(allianceReverser * -24,defaultDriveSpeed,0);
-
+            }
         }
     }
 
