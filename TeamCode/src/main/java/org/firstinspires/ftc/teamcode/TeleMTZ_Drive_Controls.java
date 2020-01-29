@@ -57,8 +57,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
-    //private Servo wrist;
-    //private Servo blinkin;
+    private Servo wrist;
 
     double drivePower;
     double armPower;
@@ -122,7 +121,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         arm = hardwareMap.dcMotor.get("arm");
         armExtension = hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
-        //wrist = hardwareMap.servo.get("wrist");
+        wrist = hardwareMap.servo.get("wrist");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
@@ -141,7 +140,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
-        //wrist.setPosition(0);
+        wrist.setPosition(0);
 
         /***********************************************
          * Tell driver station that initialization complete
@@ -249,7 +248,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
              * Wrist Controls
              *************/
 
-            //wrist.setPosition(gamepad2.right_stick_x);
+            wrist.setPosition(gamepad2.right_stick_x);
 
             /************************
              * Cap Stone thrower controls
@@ -311,8 +310,8 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 .addData("Arm Extender Power: ", armExtension.getPower());
         telemetry.addLine()
                 .addData("Claw Position: ", claw.getPosition());
-        //telemetry.addLine()
-        //        .addData("Wrist Position: ", wrist.getPosition());
+        telemetry.addLine()
+                .addData("Wrist Position: ", wrist.getPosition());
         telemetry.addLine()
                 .addData("Left Hook Position: ", leftHook.getPosition());
         telemetry.addLine()

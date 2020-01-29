@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="Auto Controls Test 2", group = "z_test")
+@Autonomous(name ="Auto Controls Sandbox", group = "z_test")
 
 //@Disabled
 
@@ -18,9 +18,9 @@ public class AutoControlsMTZSandbox extends LinearOpMode {
      * Modify these speeds to help with diagnosing drive errors
      *
      **************/
-    private static final double defaultDriveSpeed = 0.2;
-    private static final double defaultTurnSpeed = 0.4;
-    private static final int defaultPauseTime = 200;
+    private static final double defaultDriveSpeed = 0.2; //Old code wad 0.2
+    private static final double defaultTurnSpeed = 0.4; //old code had 0.2
+    private static final int defaultPauseTime = 200; //Typically 200 //debug at 1000-2000
 
 
     /**********************
@@ -61,7 +61,7 @@ public class AutoControlsMTZSandbox extends LinearOpMode {
      * Default opMode Settings       *******
      ********************************/
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","DepotWall",false);
+        autoPaths("Blue","DepotSampleWall",false);
 
     }
 
@@ -181,7 +181,7 @@ public class AutoControlsMTZSandbox extends LinearOpMode {
 
             //Park
             Drive(14, defaultDriveSpeed/2, 0);
-        } else if (pathToRun=="DepotWall" || pathToRun=="DepotBridge") {
+        } else if (pathToRun=="DepotSampleWall" || pathToRun=="DepotSampleBridge") {
             /************************************
              * Path set up -- Add to each path
              ***********************************/
@@ -202,7 +202,7 @@ public class AutoControlsMTZSandbox extends LinearOpMode {
              * Path Start
              ************/
 
-            if (pathToRun=="DepotWall") {
+            if (pathToRun=="DepotSampleWall") {
                 //Move forward slightly
                 /***********************************
                  * This code has not yet been tested

@@ -6,11 +6,29 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="Auto Controls", group = "z_test")
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
+import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
+
+@Autonomous(name ="Auto Controls Sampling", group = "z_test")
 
 //@Disabled
 
-public class AutoControlsMTZ extends LinearOpMode {
+public class AutoControlsMTZ_with_sampling extends LinearOpMode {
 
 
     /**************
@@ -18,9 +36,10 @@ public class AutoControlsMTZ extends LinearOpMode {
      * Modify these speeds to help with diagnosing drive errors
      *
      **************/
-    private static final double defaultDriveSpeed = 0.2;
-    private static final double defaultTurnSpeed = 0.4;
-    private static final int defaultPauseTime = 200;
+    private static final double defaultDriveSpeed = 0.2; //Old code wad 0.2
+    private static final double defaultTurnSpeed = 0.2; //old code had 0.2
+    private static final int defaultPauseTime = 200; //Typically 200 //debug at 1000-2000
+
 
     /**********************
      * These variables are the constants in path commands
@@ -54,10 +73,33 @@ public class AutoControlsMTZ extends LinearOpMode {
     RevBlinkinLedDriver blinkinLedDriver;
     RevBlinkinLedDriver.BlinkinPattern pattern;
 
+    /********
+     * Vuforia Objects
+     ********/
+    //x= closer and farther away (farther is more negative; closer is less negative (more positive); but it will never be in the positive range)
+    //y= right and left (right is negative; left is positive)
+    //z= up and down (down is negative; up is positive)
+    final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
+    final boolean PHONE_IS_PORTRAIT = false  ;
+    final String VUFORIA_KEY =
+            "\"AVqjUTL/////AAABmVnL+WsLRESmq47kooHwhcJo8agx+2Neapzf8VeCj/x+/y9bqF44lkQ1eOLU27J34UG8/9iN72gzW5VvpKwWCR1Cyy1IJ5QeGbgTsz9cZK8QllKDQfZOLJCMjF8om2XkeQMmxIn0ubjUfvzwM1ssaWOorEZYz0EmixrWeCJuoCt2yGWsm547w1By5sLacPmLnQf/s489lw29ibFtG8I7QkGJtUVH8T8LD+efsS/ZEKDIeaX/E+uZz5Zr0vI9EFDrC9bMRGPWHeN7TDBAFwyDDFzVe9hIo9PKaUYFe8zIMElRIsKcWyfCyAhg6+ZJ8F4qgfd+z2seDb/zMesVuWbnd0byStsK5w00TjK8/pPqJmiz";
+    final float mmPerInch        = 25.4f;
+    final float stoneZ = 2.00f * mmPerInch;
+    OpenGLMatrix lastLocation = null;
+    VuforiaLocalizer vuforia = null;
+    boolean targetVisible = false;
+    float phoneXRotate    = 0;
+    float phoneYRotate    = 0;
+    float phoneZRotate    = 0;
+    /*** End Vuforia Objects ***/
+
     @Override
 
+    /*****************************************************************************************
+     ******************* Default opMode Settings   *******************************************
+     ****************************************************************************************/
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","FoundationWall",false);
+        autoPaths("Blue","DepotSampleAudienceWall",false);
 
     }
 
@@ -216,6 +258,93 @@ public class AutoControlsMTZ extends LinearOpMode {
             //Park
             Strafe(allianceReverser * -24,defaultDriveSpeed,0);
 
+        } else if (pathToRun=="DepotSampleWall" || pathToRun=="DepotSampleBridge") {
+            /************************************
+             * Path set up -- Add to each path
+             ***********************************/
+            //Robot Setup Notes
+            telemetry.log()
+                    .add("Robot starts facing quarry on intersection between tiles one tile away from bridge line.");
+            telemetry.log()
+                    .add("Robot is using Depot Wall v0.1");
+            waitForStart();
+
+            //Turn lights off
+            if (alliance=="Blue") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            } else if (alliance=="Red") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            }
+            blinkinLedDriver.setPattern(pattern);
+
+            /************
+             * Path Start
+             ************/
+
+            if (pathToRun=="DepotSampleWall") {
+                //Move forward slightly
+                /***********************************
+                 * This code has not yet been tested
+                 ***********************************/
+                Drive(1, defaultDriveSpeed, defaultPauseTime);
+
+                //Strafe right towards first block in line
+                Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
+
+                //Add Sampling Here                 Add Sampling Here
+                //alignToSkyStone();
+
+                //Move toward first block in line
+                Drive(20, defaultDriveSpeed, defaultPauseTime);
+
+                //Lower arm
+                LowerArm(7 ,defaultPauseTime);
+
+                //Close claw to grab block
+                claw.setPosition(1);
+
+                //Raise arm slightly
+                RaiseArm(2,defaultPauseTime);
+
+                //Reverse
+                Drive(-24,defaultDriveSpeed,defaultPauseTime);
+
+                //Turn towards line
+                Turn(allianceReverser * -90,0.1,defaultPauseTime);
+
+                //Drive past line with block
+                Drive(48,defaultDriveSpeed,defaultPauseTime);
+
+            }
+            else if(pathToRun=="DepotSampleAudienceWall"){
+
+                /************************************
+                 * Path set up -- Add to each path
+                 ***********************************/
+
+                //Robot Setup Notes
+                telemetry.log().add("Robot starts facing quarry next to other alliance depot.");
+
+                waitForStart();
+
+                //Turn lights off
+                if (alliance=="Blue") {
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+                } else if (alliance=="Red") {
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+                }
+                blinkinLedDriver.setPattern(pattern);
+
+                /************
+                 * Path Start
+                 ************/
+
+                //Debug Timer
+                sleep(defaultPauseTime-200*10);
+
+                alignToSkyStone();
+
+            }
         }
     }
 
@@ -243,6 +372,93 @@ public class AutoControlsMTZ extends LinearOpMode {
 
         //Unhook Foundation
         HooksUp();
+    }
+
+    public void alignToSkyStone(){
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection   = CAMERA_CHOICE;
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+        VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
+        stoneTarget.setName("Stone Target");
+        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+        allTrackables.add(stoneTarget);
+        stoneTarget.setLocation(OpenGLMatrix
+                .translation(0, 0, stoneZ)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
+        if (CAMERA_CHOICE == BACK) {
+            phoneYRotate = -90;
+        } else {
+            phoneYRotate = 90;
+        }
+        // Rotate the phone vertical about the X axis if it's in portrait mode
+        if (PHONE_IS_PORTRAIT) {
+            phoneXRotate = 90 ;
+        }
+        /*****************
+         * Phone Placement
+         *****************/
+        final float CAMERA_FORWARD_DISPLACEMENT  = 5.0f * mmPerInch; //4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+        final float CAMERA_VERTICAL_DISPLACEMENT = -8.0f * mmPerInch; //Right 8.0f * mmPerInch;   // eg: Camera is 8 Inches right of center
+        final float CAMERA_LEFT_DISPLACEMENT     = -6.0f * mmPerInch;     // -Height eg: Camera is above the ground
+        OpenGLMatrix robotFromCamera = OpenGLMatrix
+                .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+
+        for (VuforiaTrackable trackable : allTrackables) {
+            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+        }
+
+        targetsSkyStone.activate();
+
+        waitForStart();
+
+        while (!isStopRequested()) {
+            targetVisible = false;
+            for (VuforiaTrackable trackable : allTrackables) {
+                if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible() && trackable.getName()=="Stone Target") {
+                    telemetry.addData("Visible Target", trackable.getName());
+                    targetVisible = true;
+                    OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                    if (robotLocationTransform != null) {
+                        lastLocation = robotLocationTransform;
+                    }
+                    break;
+                }
+            }
+
+            // Provide feedback as to where the robot is located (if we know).
+            if (targetVisible) {
+                //express position (translation) of robot in inches.
+                VectorF translation = lastLocation.getTranslation();
+                telemetry.addData("Pos (Front, Left, Height)(in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                        translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+
+                // express the rotation of the robot in degrees.
+                Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+                telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                telemetry.addData("Strafe Robot Right: ", translation.get(1) / mmPerInch);
+                telemetry.addData("Turn Robot CCW: ", rotation.firstAngle-90);
+                telemetry.addData("Drive Robot Forward: ", translation.get(0) / mmPerInch);
+
+
+                //Debug Timer
+                sleep(defaultPauseTime-200*10);
+            }
+            else {
+                telemetry.addData("Visible Target", "none");
+
+                //Debug Timer
+                sleep(defaultPauseTime-200*10);
+            }
+            telemetry.update();
+        }
+
+        // Disable Tracking when we are done;
+        targetsSkyStone.deactivate();
+
     }
 
     //Motion Methods
@@ -304,7 +520,7 @@ public class AutoControlsMTZ extends LinearOpMode {
         arm.setPower(0);
         Thread.sleep(pause);
     }
-    public void HooksDown()throws InterruptedException {
+    public void HooksDown() throws InterruptedException{
         //Light Reverse Power On
         lightReverse();
         sleep(500);
