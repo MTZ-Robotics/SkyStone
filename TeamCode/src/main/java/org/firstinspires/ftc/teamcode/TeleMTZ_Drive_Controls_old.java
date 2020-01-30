@@ -5,15 +5,16 @@ import android.view.View;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls test", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls OLD", group ="A_Top")
 
-//@Disabled
+@Disabled
 
-public class TeleMTZ_Drive_Controls_test extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -54,7 +55,6 @@ public class TeleMTZ_Drive_Controls_test extends LinearOpMode {
     private Servo rightHook;
     private Servo blockThrower;
     private Servo wrist;
-    //private Servo blinkin;
 
     double drivePower;
     double armPower;
@@ -68,7 +68,7 @@ public class TeleMTZ_Drive_Controls_test extends LinearOpMode {
     public void runOpMode() {
 
         boolean rightStrafer = true;
-        boolean spurGearArm = true;
+        boolean spurGearArm = false;
         double driveSpeed = 0.5;
         telemetry.log().add("Strafe Right:"+rightStrafer+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
         controlRobot(rightStrafer,spurGearArm,driveSpeed);

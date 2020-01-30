@@ -8,6 +8,7 @@ import android.view.View;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -34,7 +35,6 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
     boolean yellowTimerElapsed;
     boolean redTimerElapsed;
     boolean endGameStartElapsed;
-    View relativeLayout;
 
     /***********
      * Lights Control Declarations
@@ -93,6 +93,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         yellowWarningTime = 70;
         redWarningTime = 80;
         defaultArmPower = 0.75;
+        double wristPositionDesired = 0.3;
 
         /***************
          * Set Timer Variables
@@ -248,7 +249,14 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
              * Wrist Controls
              *************/
 
-            wrist.setPosition(gamepad2.right_stick_x);
+            //wrist.setPosition(gamepad2.right_stick_x);
+            if (gamepad2.right_bumper) {
+                wristPositionDesired = wristPositionDesired - 0.05;
+            } else if (gamepad2.left_bumper) {
+                wristPositionDesired = wristPositionDesired + 0.05;
+            }
+
+            wrist.setPosition(wristPositionDesired);
 
             /************************
              * Cap Stone thrower controls

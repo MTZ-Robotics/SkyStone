@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name ="Auto Controls", group = "z_test")
 
@@ -169,11 +170,12 @@ public class AutoControlsMTZ extends LinearOpMode {
             //Forward to bridge area
             Drive(24, defaultDriveSpeed, defaultPauseTime);
 
-            //Lower arm gracefully
+           /* //Lower arm gracefully
             LowerArm(10, defaultPauseTime*2);
 
             //Raise arm a little
             RaiseArm(3, defaultPauseTime);
+            */
 
             //Park
             Drive(14, defaultDriveSpeed/2, 0);
@@ -287,7 +289,15 @@ public class AutoControlsMTZ extends LinearOpMode {
         }
     }
     public void RaiseArm(int distance, int pause) throws InterruptedException {
-        //Use time based arm controls since the arm falls when the target distance is reached
+        if (opModeIsActive()) {
+            RaiseByInches (distance);
+            ArmPower(.75);
+            }
+            ArmPower(0);
+            Thread.sleep(pause);
+
+
+       /* //Use time based arm controls since the arm falls when the target distance is reached
 
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         arm.setPower(0.4);
@@ -296,13 +306,16 @@ public class AutoControlsMTZ extends LinearOpMode {
         //sleep(1000);
         arm.setPower(0.2);
         Thread.sleep(pause);
+        */
     }
 
     public void LowerArm(int distance, int pause) throws InterruptedException {
-        arm.setPower(0.1);
+        /*arm.setPower(0.1);
         sleep(distance * 100);
         arm.setPower(0);
         Thread.sleep(pause);
+
+         */
     }
     public void HooksDown()throws InterruptedException {
         //Light Reverse Power On

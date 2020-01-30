@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @TeleOp(name="Right Strafe Old Arm", group ="A_Top")
 
-//@Disabled
+@Disabled
 
 public class TeleRightStrafeOldArm extends TeleMTZ_Drive_Controls {
 

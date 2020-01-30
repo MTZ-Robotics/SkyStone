@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -53,8 +54,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 //y= right and left (right is negative; left is positive)
 //z= up and down (down is negative; up is positive)
 @TeleOp(name="Test SKYSTONE Targeting", group ="z_test")
-//@Disabled
-public class z_test_SkyStone_Targeting extends LinearOpMode {
+@Disabled
+public class z_test_SkyStone_Targeting_old_with_comments extends LinearOpMode {
 
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
     // 2) Phone Orientation. Choices are: PHONE_IS_PORTRAIT = true (portrait) or PHONE_IS_PORTRAIT = false (landscape)
