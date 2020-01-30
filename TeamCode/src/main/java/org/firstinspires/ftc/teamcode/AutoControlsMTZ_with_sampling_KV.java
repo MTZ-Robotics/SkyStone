@@ -25,11 +25,11 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-@Autonomous(name ="Auto Controls Sampling", group = "z_test")
+@Autonomous(name ="Auto Controls Sampling KV", group = "z_test")
 
 //@Disabled
 
-public class AutoControlsMTZ_with_sampling extends LinearOpMode {
+public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
 
 
     /**************
@@ -51,9 +51,6 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
     private static final double pi = 3.1415;
     private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
     private static final double experimentalInchesPerTurn = 91.8;
-    private static final double armTicksPerRevolution = 145.6; //Need verification
-    private static final double armGearReduction = 2.0; //Need Verification
-    private static final double conversionTicksToDegrees = (armTicksPerRevolution * armGearReduction) / 360;
     private int allianceReverser = 1;
 
     /*****************
@@ -213,16 +210,16 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                 Strafe(allianceReverser * 12,0.1,200);
             }
             //Forward to bridge area
-            Drive(24+12, defaultDriveSpeed, 0);
+            Drive(24, defaultDriveSpeed, defaultPauseTime);
 
             //Lower arm gracefully
-            //LowerArm(10, defaultPauseTime*2);
+            LowerArm(10, defaultPauseTime*2);
 
             //Raise arm a little
-            //RaiseArm(3, defaultPauseTime);
+            RaiseArm(3, defaultPauseTime);
 
             //Park
-            //Drive(14, defaultDriveSpeed/2, 0);
+            Drive(14, defaultDriveSpeed/2, 0);
         } else if (pathToRun=="DepotWall" || pathToRun=="DepotBridge") {
             /************************************
              * Path set up -- Add to each path
@@ -296,7 +293,69 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                 Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
 
                 //Add Sampling Here                 Add Sampling Here
+                int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+                parameters.vuforiaLicenseKey = VUFORIA_KEY;
+                parameters.cameraDirection   = CAMERA_CHOICE;
+                vuforia = ClassFactory.getInstance().createVuforia(parameters);
+                VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+                VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
+                stoneTarget.setName("Stone Target");
+                List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+                allTrackables.add(stoneTarget);
+                stoneTarget.setLocation(OpenGLMatrix
+                        .translation(0, 0, stoneZ)
+                        .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
+                if (CAMERA_CHOICE == BACK) {
+                    phoneYRotate = -90;
+                } else {
+                    phoneYRotate = 90;
+                }
+                // Rotate the phone vertical about the X axis if it's in portrait mode
+                if (PHONE_IS_PORTRAIT) {
+                    phoneXRotate = 90 ;
+                }
 
+                final float CAMERA_FORWARD_DISPLACEMENT  = 5.0f * mmPerInch; //4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+                final float CAMERA_VERTICAL_DISPLACEMENT = -8.0f * mmPerInch; //Right 8.0f * mmPerInch;   // eg: Camera is 8 Inches right of center
+                final float CAMERA_LEFT_DISPLACEMENT     = -6.0f * mmPerInch;     // -Height eg: Camera is above the ground
+                OpenGLMatrix robotFromCamera = OpenGLMatrix
+                        .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
+                        .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
+
+                for (VuforiaTrackable trackable : allTrackables) {
+                    ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+                }
+
+                targetsSkyStone.activate();
+
+                targetVisible = false;
+                while (!isStopRequested() && targetVisible == false) {
+                    StrafeWithoutEncoders(0.1,200);
+                    for (VuforiaTrackable trackable : allTrackables) {
+                        if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible() && trackable.getName()=="Stone Target") {
+                            telemetry.addData("Visible Target", trackable.getName());
+                            targetVisible = true;
+                            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                            if (robotLocationTransform != null) {
+                                lastLocation = robotLocationTransform;
+                            }
+                            break;
+                        }
+                    }
+
+                    if (targetVisible) {
+                        //express position (translation) of robot in inches.
+                        VectorF translation = lastLocation.getTranslation();
+                        telemetry.addData("Pos (Front, Left, Height)(in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
+                                translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
+                        Strafe(1,0.1,100);
+                    }
+                    else {
+                        telemetry.addData("Visible Target", "none");
+                    }
+                    telemetry.update();
+                }
 
                 //alignToSkyStone();
 
@@ -346,7 +405,7 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                  ************/
 
                 //Debug Timer
-                sleep(1000);
+                sleep(defaultPauseTime-200*10);
 
                 alignToSkyStone();
 
@@ -479,13 +538,13 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
 
 
                 //Debug Timer
-                sleep(20000);
+                sleep(defaultPauseTime-200*10);
             }
             else {
                 telemetry.addData("Visible Target", "none");
 
                 //Debug Timer
-                sleep(500);
+                sleep(defaultPauseTime-200*10);
             }
             telemetry.update();
         }
@@ -523,6 +582,25 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
             Thread.sleep(pause);
         }
     }
+
+    public void StrafeWithoutEncoders (double power, int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            StopAndResetDriveEncoders();
+            frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            frontLeft.setPower(power * allianceReverser);
+            frontRight.setPower(-power * allianceReverser);
+            backLeft.setPower(power * allianceReverser);
+            backRight.setPower(-power * allianceReverser);
+            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                DisplayDriveTelemetry();
+            }
+            DrivePower(0);
+            Thread.sleep(pause);
+        }
+    }
     public void Turn(int degrees, double power, int pause) throws InterruptedException {
         if (opModeIsActive()) {
             StopAndResetDriveEncoders();
@@ -537,18 +615,6 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
         }
     }
     public void RaiseArm(int distance, int pause) throws InterruptedException {
-
-        //Use encoder for arm
-        RaiseByInches(distance);
-        RunArmToPosition();
-        ArmPower(1);
-
-        while (arm.isBusy()) {
-            DisplayArmTelemetry();
-        }
-
-        /*
-
         //Use time based arm controls since the arm falls when the target distance is reached
 
         arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -558,27 +624,13 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
         //sleep(1000);
         arm.setPower(0.2);
         Thread.sleep(pause);
-
-         */
     }
 
     public void LowerArm(int distance, int pause) throws InterruptedException {
-        //Encoder controls
-        RaiseByInches(-1*distance);
-        RunArmToPosition();
-        ArmPower(.5);
-
-        while (arm.isBusy()) {
-            DisplayArmTelemetry();
-        }
-
-        /* Time based controls
         arm.setPower(0.1);
         sleep(distance * 100);
         arm.setPower(0);
         Thread.sleep(pause);
-
-         */
     }
     public void HooksDown() throws InterruptedException{
         //Light Reverse Power On
@@ -696,20 +748,10 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void RaiseByInches(int distance) {
-        //New Arm may need a new constant
-        arm.setTargetPosition(distance * 450);
-    }
-
-    public void RaiseByDegrees(int angle) {
-        double tickCalc= angle / conversionTicksToDegrees;
-        int intTicks = (int)tickCalc;
-        arm.setTargetPosition(intTicks);
+        arm.setTargetPosition(distance * 45);
     }
     public void ArmPower(double power) {
         arm.setPower(power);
     }
-
-
-
 
 }
