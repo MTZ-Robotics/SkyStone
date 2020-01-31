@@ -298,7 +298,7 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                 //Add Sampling Here                 Add Sampling Here
 
 
-                //alignToSkyStone();
+                //determineSkyStone();
 
                 //Move toward first block in line
                 Drive(20, defaultDriveSpeed, defaultPauseTime);
@@ -348,7 +348,7 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                 //Debug Timer
                 sleep(1000);
 
-                alignToSkyStone();
+                determineSkyStone();
 
             } else {
 
@@ -408,7 +408,7 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
         HooksUp();
     }
 
-    public void alignToSkyStone(){
+    public string determineSkyStone(){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
