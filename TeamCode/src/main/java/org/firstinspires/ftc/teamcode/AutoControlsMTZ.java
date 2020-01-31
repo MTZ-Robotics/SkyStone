@@ -218,6 +218,31 @@ public class AutoControlsMTZ extends LinearOpMode {
             //Park
             Strafe(allianceReverser * -24,defaultDriveSpeed,0);
 
+        } else {
+
+            /************************************
+             * Path Selection Error
+             ***********************************/
+
+            //Robot Setup Notes
+            telemetry.log().add("Error in Path Selection");
+
+            telemetry.update();
+
+            if (alliance=="Blue") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
+            } else if (alliance=="Red") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
+            }
+            blinkinLedDriver.setPattern(pattern);
+
+            waitForStart();
+
+            /************
+             * Path Start
+             ************/
+            sleep(30000);
+
         }
     }
 

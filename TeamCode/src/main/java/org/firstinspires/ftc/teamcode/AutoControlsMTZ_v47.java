@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name ="Auto Controls v.46 Rosemary", group = "z_test")
+@Autonomous(name ="Auto Controls v.47 Cinnamon", group = "z_test")
 
 //@Disabled
 
-public class AutoControlsMTZ_v46 extends LinearOpMode {
+public class AutoControlsMTZ_v47 extends LinearOpMode {
 
 
     /**************
