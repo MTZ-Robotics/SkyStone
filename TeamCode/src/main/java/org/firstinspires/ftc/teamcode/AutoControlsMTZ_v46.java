@@ -221,6 +221,86 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
             //Park
             Strafe(allianceReverser * -24,defaultDriveSpeed,0);
 
+        } else if (pathToRun=="DepotSampleWall" || pathToRun=="DepotSampleBridge") {
+            /************************************
+             * Path set up -- Add to each path
+             ***********************************/
+            //Robot Setup Notes
+            telemetry.log().add("Robot is using Depot Wall v0.1");
+
+            waitForStart();
+
+            //Turn lights off
+            if (alliance=="Blue") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            } else if (alliance=="Red") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            }
+            blinkinLedDriver.setPattern(pattern);
+
+            /************
+             * Path Start
+             ************/
+
+            if (pathToRun=="DepotSampleWall") {
+                //Move forward slightly
+                /***********************************
+                 * This code has not yet been tested
+                 ***********************************/
+                Drive(10, defaultDriveSpeed, defaultPauseTime);
+                grabSkyStone(allianceReverser);
+
+                //Strafe right towards first block in line
+                //Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
+
+                //Move toward first block in line
+                //Drive(20, defaultDriveSpeed, defaultPauseTime);
+
+                //Lower arm
+                //LowerArm(7 ,defaultPauseTime);
+
+                //Close claw to grab block
+                //claw.setPosition(1);
+
+                //Raise arm slightly
+                //RaiseArm(2,defaultPauseTime);
+
+                //Reverse
+                //Drive(-24,defaultDriveSpeed,defaultPauseTime);
+
+                //Turn towards line
+                Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
+
+                //Drive past line with block
+                Drive(3*24,defaultDriveSpeed,defaultPauseTime);
+                
+                Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
+                //Reverse
+                Drive(-12,defaultDriveSpeed,defaultPauseTime);
+                moveFoundation(allianceReverser);
+
+            //Align to Park
+            if (pathToRun=="DepotSampleBridge") {
+                Strafe(allianceReverser * -8, defaultDriveSpeed, defaultPauseTime);
+            } else {
+                Strafe(allianceReverser * 12,0.1,200);
+            }
+            //Forward to bridge area
+            Drive(24, defaultDriveSpeed, defaultPauseTime);
+
+           /* //Lower arm gracefully
+            LowerArm(10, defaultPauseTime*2);
+
+            //Raise arm a little
+            RaiseArm(3, defaultPauseTime);
+            */
+
+            //Park
+            Drive(14, defaultDriveSpeed/2, 0);
+                
+                
+            }
+
         } else if (pathToRun=="FoundationSampleWall") {
 
             /************************************
@@ -244,31 +324,31 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
              ******************
              * Start facing wall, center of foundation w/ arm raised
              * Go to Foundation
-                * Backwards fast 30”
-                * Backwards slow for 5”
+                * Backwards fast 30Â”
+                * Backwards slow for 5Â”
              * Move Foundation
                 * Hooks Down
-                * Turn Wall to Audience with forward 90°
-                * Backwards 24” Fast
+                * Turn Wall to Audience with forward 90Â°
+                * Backwards 24Â” Fast
                 * Hooks Up
              * Travel to Audience
-                * Forwards 10”
-                * Turn Audience to Bridge 90° Fast
-                * Backwards 24”
+                * Forwards 10Â”
+                * Turn Audience to Bridge 90Â° Fast
+                * Backwards 24Â”
                 * Strafe towards audience Fast with tweak towards wall
-                * Strafe towards audience slow for 6”
+                * Strafe towards audience slow for 6Â”
              * Sample
                 * Turn on Vuforia
-                * Backwards 10” medium
-                * Strafe towards Building Site 6”
+                * Backwards 10Â” medium
+                * Strafe towards Building Site 6Â”
                 * Sample Stone (Ends with arm raised claw closed)
              * Go to foundation
-             * Turn bridge to Building Site 90° Fast
-             * Strafe towards Wall 24” Fast
-             * Forward with tweak towards Wall for 96”
-             * Strafe Bridge and forward 6”
+             * Turn bridge to Building Site 90Â° Fast
+             * Strafe towards Wall 24Â” Fast
+             * Forward with tweak towards Wall for 96Â”
+             * Strafe Bridge and forward 6Â”
              * Open claw
-             * Strafe Wall and backwards 40”
+             * Strafe Wall and backwards 40Â”
              */
 
             /************
@@ -366,11 +446,11 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     public void foundationToAudienceDepot(int allianceReverser) throws InterruptedException {
         /***
         * Travel to Audience
-        * Forwards 10”
-        * Turn Audience to Bridge 90° Fast
-        * Backwards 24”
+        * Forwards 10Â”
+        * Turn Audience to Bridge 90Â° Fast
+        * Backwards 24Â”
         * Strafe towards audience Fast with tweak towards wall
-        * Strafe towards audience slow for 6”
+        * Strafe towards audience slow for 6Â”
         */
 
         Drive(18, defaultDriveSpeed, defaultPauseTime);
@@ -437,10 +517,10 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
 
     public void quarryToMovedFoundation (int allianceReverser) throws InterruptedException{
         /*********
-         * * Turn bridge to Building Site 90° Fast
-         * Strafe towards Wall 24” Fast
-         * Forward with tweak towards Wall for 96”
-         * Strafe Bridge and forward 6”
+         * * Turn bridge to Building Site 90Â° Fast
+         * Strafe towards Wall 24Â” Fast
+         * Forward with tweak towards Wall for 96Â”
+         * Strafe Bridge and forward 6Â”
          */
         Turn(allianceReverser*-90,defaultTurnSpeed,defaultPauseTime);
         Strafe(allianceReverser*24,defaultDriveSpeed,defaultPauseTime);
