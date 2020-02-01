@@ -170,10 +170,11 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
            RaiseArm(14,defaultPauseTime/4);
         }
          */
+        telemetry.setAutoClear(false);
         telemetry.log().clear();
-        telemetry.update();
         telemetry.log().add(pathToRun+" Initialized. Go "+alliance+" alliance");
 
+        telemetry.update();
 
         //Paths written for Blue alliance and reverse turns if on Red alliance
         allianceReverser=1;
@@ -198,6 +199,8 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
                 //Robot Setup Notes
                 telemetry.log().add("Robot starts facing quarry next to other alliance depot.");
 
+                telemetry.update();
+
                 waitForStart();
 /*
                 //Turn lights off
@@ -215,7 +218,20 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
                 //Debug Timer
                 sleep(1000);
 
-                alignToSkyStone();
+                string skyStoneLocation = determineSkyStone();
+
+                if (skyStoneLocation == "Left"){
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (skyStoneLocation == "Center"){
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (skyStoneLocation == "Right"){
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                    blinkinLedDriver.setPattern(pattern);
+                }
+
+                sleep(30000);
 
             } else {
 
@@ -225,6 +241,8 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
 
                 //Robot Setup Notes
                 telemetry.log().add("Error in Path Selection");
+
+                telemetry.update();
 
                 waitForStart();
 
@@ -244,7 +262,9 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
     //Path Methods
 
 
-    public void alignToSkyStone(){
+    public string determineSkyStone(){
+
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
@@ -280,17 +300,25 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
-        sleep(5000);
 
         targetsSkyStone.activate();
 
-        //waitForStart();
+        pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_GRAY;
+        blinkinLedDriver.setPattern(pattern);
 
-        while (!isStopRequested()) {
+
+        sleep(1000);
+
+        while (opModeIsActive && targetVisible==false) {
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables) {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible() && trackable.getName()=="Stone Target") {
                     telemetry.addData("Visible Target", trackable.getName());
+                    telemetry.update();
+
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.WHITE;
+                    blinkinLedDriver.setPattern(pattern);
+
                     targetVisible = true;
                     OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
                     if (robotLocationTransform != null) {
@@ -314,17 +342,27 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
                 telemetry.addData("Turn Robot CCW: ", rotation.firstAngle-90);
                 telemetry.addData("Drive Robot Forward: ", translation.get(0) / mmPerInch);
 
+                telemetry.update();
 
                 //Debug Timer
-                sleep(10000);
+                sleep(200);
             }
             else {
                 telemetry.addData("Visible Target", "none");
 
+                telemetry.update();
                 //Debug Timer
-                sleep(10000);
+                sleep(1000);
             }
             telemetry.update();
+        }
+
+        if ((translation.get(1) / mmPerInch)<-4) {
+            return "Left"
+        } else if ((translation.get(1) / mmPerInch)>3) {
+            return "Right"
+        } else {
+            return "Center"
         }
 
         // Disable Tracking when we are done;
@@ -339,3 +377,32 @@ public class AutoControlsMTZ_testingSampling extends LinearOpMode {
 
 
 }
+
+/* Copyright (c) 2019 FIRST. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted (subject to the limitations in the disclaimer below) provided that
+ * the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+ * promote products derived from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */

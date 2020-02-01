@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name ="Auto Controls v.45 Spearmint", group = "z_test")
+@Autonomous(name ="Auto Controls v.47 Cinnamon", group = "z_test")
 
 //@Disabled
 
-public class AutoControlsMTZ extends LinearOpMode {
+public class AutoControlsMTZ_v47 extends LinearOpMode {
 
 
     /**************
@@ -32,6 +32,9 @@ public class AutoControlsMTZ extends LinearOpMode {
     private static final double pi = 3.1415;
     private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
     private static final double experimentalInchesPerTurn = 91.8;
+    private static final double armDistanceAdjustment = 200.00;
+    private static final double strafeDistanceAdjustment = 1.00;
+    private static final double driveDistanceAdjustment = 1.00;
     private int allianceReverser = 1;
 
     /*****************
@@ -58,7 +61,7 @@ public class AutoControlsMTZ extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","FoundationWall",false);
+        autoPaths("Red","FoundationSampleWall",false);
 
     }
 
@@ -142,7 +145,7 @@ public class AutoControlsMTZ extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Robot should face towards wall centered in tile next to bridge.");
+            telemetry.log().add("Robot should face towards wall centered in middle tile foundation side.");
 
             waitForStart();
 
@@ -218,6 +221,91 @@ public class AutoControlsMTZ extends LinearOpMode {
             //Park
             Strafe(allianceReverser * -24,defaultDriveSpeed,0);
 
+        } else if (pathToRun=="FoundationSampleWall") {
+
+            /************************************
+             * Path set up -- Add to each path
+             ***********************************/
+            //Robot Setup Notes
+            telemetry.log().add("Robot should face towards wall centered in middle tile foundation side.");
+
+            waitForStart();
+
+            //Turn lights off
+            if (alliance=="Blue") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            } else if (alliance=="Red") {
+                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            }
+            blinkinLedDriver.setPattern(pattern);
+
+            /******************
+             * Path Pseudo Code
+             ******************
+             * Start facing wall, center of foundation w/ arm raised
+             * Go to Foundation
+                * Backwards fast 30”
+                * Backwards slow for 5”
+             * Move Foundation
+                * Hooks Down
+                * Turn Wall to Audience with forward 90°
+                * Backwards 24” Fast
+                * Hooks Up
+             * Travel to Audience
+                * Forwards 10”
+                * Turn Audience to Bridge 90° Fast
+                * Backwards 24”
+                * Strafe towards audience Fast with tweak towards wall
+                * Strafe towards audience slow for 6”
+             * Sample
+                * Turn on Vuforia
+                * Backwards 10” medium
+                * Strafe towards Building Site 6”
+                * Sample Stone (Ends with arm raised claw closed)
+             * Go to foundation
+             * Turn bridge to Building Site 90° Fast
+             * Strafe towards Wall 24” Fast
+             * Forward with tweak towards Wall for 96”
+             * Strafe Bridge and forward 6”
+             * Open claw
+             * Strafe Wall and backwards 40”
+             */
+
+            /************
+             * Path Start
+             ************/
+
+            goToFoundationfromWall(allianceReverser);
+            moveFoundation(allianceReverser);
+            foundationToAudienceDepot(allianceReverser);
+            grabSkyStone(allianceReverser);
+            quarryToMovedFoundation(allianceReverser);
+
+            //Open Claw
+            claw.setPosition(0);
+            sleep(500);
+            //Back up to park against wall
+            Drive(-30, defaultDriveSpeed*2, defaultPauseTime);
+
+
+        } else if (pathToRun=="Calibrate") {
+            /************************************
+             * Path set up -- Add to each path
+             ***********************************/
+            //Robot Setup Notes
+            telemetry.log().add("Robot Raises Arm 10, Moves Forward 24, then Left 24, then Rotate Left 180");
+
+            waitForStart();
+
+            /************
+             * Path Start
+             ************/
+
+            RaiseArm(10,2000);
+            Drive(24,defaultDriveSpeed,5000);
+            Strafe(24,defaultDriveSpeed,5000);
+            Turn(-180,defaultTurnSpeed,0);
+
         } else {
 
             /************************************
@@ -244,7 +332,11 @@ public class AutoControlsMTZ extends LinearOpMode {
             sleep(30000);
 
         }
+
+        // End of Paths
     }
+
+
 
     //Path Methods
     public void goToFoundationfromWall(int allianceReverser) throws InterruptedException{
@@ -271,11 +363,101 @@ public class AutoControlsMTZ extends LinearOpMode {
         //Unhook Foundation
         HooksUp();
     }
+    public void foundationToAudienceDepot(int allianceReverser) throws InterruptedException {
+        /***
+        * Travel to Audience
+        * Forwards 10”
+        * Turn Audience to Bridge 90° Fast
+        * Backwards 24”
+        * Strafe towards audience Fast with tweak towards wall
+        * Strafe towards audience slow for 6”
+        */
+
+        Drive(18, defaultDriveSpeed, defaultPauseTime);
+        Turn(allianceReverser * -90, defaultTurnSpeed, defaultPauseTime);
+        Drive(-30, defaultDriveSpeed, defaultPauseTime);
+        Strafe(allianceReverser * -4*24, defaultDriveSpeed*2, defaultPauseTime);
+        Drive(-12, defaultDriveSpeed, defaultPauseTime);
+        Drive(10, defaultDriveSpeed, defaultPauseTime);
+        Strafe(allianceReverser * -18, defaultDriveSpeed/2, defaultPauseTime);
+        Strafe(allianceReverser * 8, defaultDriveSpeed/2, defaultPauseTime);
+
+    }
+    public void grabSkyStone(int allianceReverser) throws InterruptedException {
+        //Determine which of the 3 positions to go after
+        //position 1 = audience side
+        //position 2 = middle
+        //position 3 = bridge side
+        // if blue alliance and location = right, then position 1
+        //if Red alliance and location = right, then position 3
+
+        int skyStonePosition = 2;
+        string skyStoneLocation = determineSkyStone();
+
+        if (skyStoneLocation == "Left") {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+            blinkinLedDriver.setPattern(pattern);
+            if (alliance == "Blue") { skyStonePosition = 3;
+            } else {                  skyStonePosition = 1;
+            }
+
+        } else if (skyStoneLocation == "Center") {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+            blinkinLedDriver.setPattern(pattern);
+            skyStonePosition = 2;
+
+        } else if (skyStoneLocation == "Right") {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+            blinkinLedDriver.setPattern(pattern);
+            if (alliance == "Blue") { skyStonePosition = 1;
+            } else {                  skyStonePosition = 3;
+            }
+        }
+        //Angle towards skystone
+        if (skyStonePosition==1) {
+            Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
+        } else if (skyStonePosition==3) {
+            Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
+        }
+        Drive(21,defaultDriveSpeed/2,defaultPauseTime);
+        RaiseArm(-2,defaultPauseTime);
+        //CloseClaw();
+        claw.setPosition(1);
+        sleep(1000);
+        RaiseArm(4,defaultPauseTime);
+        Drive(-21,defaultDriveSpeed/2,defaultPauseTime);
+       //reorient back to facing quarry
+        if (skyStonePosition==1) {
+            Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
+        } else if (skyStonePosition==3) {
+            Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
+        }
+    }
+    }
+
+    public void quarryToMovedFoundation (int allianceReverser) throws InterruptedException{
+        /*********
+         * * Turn bridge to Building Site 90° Fast
+         * Strafe towards Wall 24” Fast
+         * Forward with tweak towards Wall for 96”
+         * Strafe Bridge and forward 6”
+         */
+        Turn(allianceReverser*-90,defaultTurnSpeed,defaultPauseTime);
+        Strafe(allianceReverser*24,defaultDriveSpeed,defaultPauseTime);
+        Drive(3*24, defaultDriveSpeed*2, defaultPauseTime);
+        Turn(allianceReverser*20,defaultTurnSpeed,defaultPauseTime);
+        Drive(24, defaultDriveSpeed*2, defaultPauseTime);
+    }
+    //Sampling Methods
+
+    public string determineSkyStone() throws InterruptedException {
+        return "Center"
+    }
 
     //Motion Methods
 
     public void Drive(int distance, double motorPower, int pause) throws InterruptedException {
-        if (opModeIsActive()) {
+       if (opModeIsActive()) {
             StopAndResetDriveEncoders();
             DriveByInches(distance);
             RunDriveToPosition();
@@ -287,10 +469,11 @@ public class AutoControlsMTZ extends LinearOpMode {
             Thread.sleep(pause);
         }
     }
-    public void Strafe(int distance, double power, int pause) throws InterruptedException {
+    public void Strafe(int leftDistance, double power, int pause) throws InterruptedException {
+        //Left is positive
         if (opModeIsActive()) {
             StopAndResetDriveEncoders();
-            StrafeByInches(distance);
+            StrafeByInches(leftDistance);
             RunDriveToPosition();
             DrivePower(power);
             while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
@@ -300,10 +483,11 @@ public class AutoControlsMTZ extends LinearOpMode {
             Thread.sleep(pause);
         }
     }
-    public void Turn(int degrees, double power, int pause) throws InterruptedException {
+    public void Turn(int rightDegrees, double power, int pause) throws InterruptedException {
+        //Left is negative
         if (opModeIsActive()) {
             StopAndResetDriveEncoders();
-            TurnByAngle(degrees);
+            TurnByAngle(rightDegrees);
             RunDriveToPosition();
             DrivePower(power);
             while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
@@ -413,34 +597,47 @@ public class AutoControlsMTZ extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
+    public void StopAndResetArmEncoder() {
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
     public void RunDriveToPosition() {
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
+    public void RunArmToPosition() {
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
 
 //Distance Calculation Methods
 
     public void DriveByInches(int distance) {
-        frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        frontRight.setTargetPosition(distance * (int) conversionTicksToInches);
-        backLeft.setTargetPosition(-1 * distance * (int) conversionTicksToInches);
-        backRight.setTargetPosition(-1 * distance * (int) conversionTicksToInches);
+        private double calibrationMeasurement = 1.00;
+        private double correctedDistance = (distance*(strafeDistanceAdjustment));
+        frontLeft.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
+        frontRight.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
+        backLeft.setTargetPosition((int)(-1 * correctedDistance * conversionTicksToInches));
+        backRight.setTargetPosition((int)(-1 * correctedDistance * conversionTicksToInches));
     }
 
     public void StrafeByInches(int distance) {
-        frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        frontRight.setTargetPosition(-distance * (int) conversionTicksToInches);
-        backLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        backRight.setTargetPosition(-distance * (int) conversionTicksToInches);
+        private double correctedDistance = distanceistance*(strafeDistanceAdjustment);
+        frontLeft.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
+        frontRight.setTargetPosition((int)(-correctedDistance * conversionTicksToInches));
+        backLeft.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
+        backRight.setTargetPosition((int)(-correctedDistance * conversionTicksToInches));
     }
 
     public void TurnByAngle(int degrees) {
-        frontLeft.setTargetPosition(degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
-        frontRight.setTargetPosition(-degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
-        backLeft.setTargetPosition(-degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
-        backRight.setTargetPosition(degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
+        frontLeft.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        frontRight.setTargetPosition((int)(-degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        backLeft.setTargetPosition((int)(-degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        backRight.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+    }
+    public void RaiseByInches(int distance) {
+        private int correctedDistance = (int)(distance*(armDistanceAdjustment));
+        arm.setTargetPosition(correctedDistance);
     }
 
 //Power Methods
@@ -450,15 +647,6 @@ public class AutoControlsMTZ extends LinearOpMode {
         frontRight.setPower(power);
         backLeft.setPower(power);
         backRight.setPower(power);
-    }
-    public void StopAndResetArmEncoder() {
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-    public void RunArmToPosition() {
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-    public void RaiseByInches(int distance) {
-        arm.setTargetPosition(distance * 45);
     }
     public void ArmPower(double power) {
         arm.setPower(power);
