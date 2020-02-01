@@ -1,24 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_KV", group ="A_Top")
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_KV extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -93,7 +86,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         yellowWarningTime = 70;
         redWarningTime = 80;
         defaultArmPower = 0.75;
-        double wristPositionDesired = 0.5;
+        double wristPositionDesired = 0.3;
 
         /***************
          * Set Timer Variables
@@ -141,7 +134,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
-        wrist.setPosition(.5);
+        wrist.setPosition(0.45);
 
         /***********************************************
          * Tell driver station that initialization complete
@@ -249,11 +242,11 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
              * Wrist Controls
              *************/
 
-            //wrist.setPosition(gamepad2.right_stick_x);
+            //wrist position;
             if (gamepad2.right_bumper) {
-                wristPositionDesired = wristPositionDesired - 0.01;
+                wristPositionDesired = wristPositionDesired - 0.05;
             } else if (gamepad2.left_bumper) {
-                wristPositionDesired = wristPositionDesired + 0.01;
+                wristPositionDesired = wristPositionDesired + 0.05;
             }
 
             wrist.setPosition(wristPositionDesired);

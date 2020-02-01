@@ -61,7 +61,9 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
+    private DcMotor armExtension;
     private Servo claw;
+    private Servo wrist;
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
@@ -100,8 +102,7 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
      ******************* Default opMode Settings   *******************************************
      ****************************************************************************************/
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","DepotSampleAudienceWall",false);
-
+        autoPaths("Blue","DepotSampleWall",false);
     }
 
     public void autoPaths(String alliance,String pathToRun,Boolean supportArm) throws InterruptedException {
@@ -118,7 +119,9 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
+        armExtension= hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
+        wrist = hardwareMap.servo.get("wrist");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
@@ -128,7 +131,7 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
         /**********
          * Commenting out arm reverse to see if it will keep the arm in the correct direction
          */
-        //arm.setDirection(DcMotor.Direction.REVERSE);
+       // arm.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
 
@@ -151,15 +154,15 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
          */
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
+        wrist.setPosition(0.5);
+        claw.setPosition(1);
 
         StopAndResetAllEncoders();
 
         /************
-         * Raise the arm to fit within 18" long dimension
+         * Raise the arm to avoid dragging ground
          ************/
-        if (oldArm) {
-           RaiseArm(14,defaultPauseTime/4);
-        }
+        RaiseArm(2,defaultPauseTime/4);
         telemetry.log().clear();
         telemetry.update();
         telemetry.log().add(pathToRun+" Initialized. Go "+alliance+" alliance");
@@ -287,10 +290,9 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
                 /***********************************
                  * This code has not yet been tested
                  ***********************************/
-                Drive(1, defaultDriveSpeed, defaultPauseTime);
-
-                //Strafe right towards first block in line
-                Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
+                //Drive up to quarry
+                Drive(12, defaultDriveSpeed, defaultPauseTime);
+                Strafe(allianceReverser*28,defaultDriveSpeed,defaultPauseTime);
 
                 //Add Sampling Here                 Add Sampling Here
                 int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -330,56 +332,28 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
                 targetsSkyStone.activate();
 
                 targetVisible = false;
-                while (!isStopRequested() && targetVisible == false) {
-                    StrafeWithoutEncoders(0.1,200);
+                double currentStrafePosition = 0;
+                while (!isStopRequested() && targetVisible == false && currentStrafePosition < 40) {
+                    currentStrafePosition = frontLeft.getCurrentPosition() / 5.7934;
+                    Strafe(allianceReverser*-40,0.05,100);
                     for (VuforiaTrackable trackable : allTrackables) {
                         if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible() && trackable.getName()=="Stone Target") {
                             telemetry.addData("Visible Target", trackable.getName());
                             targetVisible = true;
-                            OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
-                            if (robotLocationTransform != null) {
-                                lastLocation = robotLocationTransform;
-                            }
                             break;
                         }
                     }
-
-                    if (targetVisible) {
-                        //express position (translation) of robot in inches.
-                        VectorF translation = lastLocation.getTranslation();
-                        telemetry.addData("Pos (Front, Left, Height)(in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
-                                translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
-                        Strafe(1,0.1,100);
-                    }
-                    else {
-                        telemetry.addData("Visible Target", "none");
-                    }
-                    telemetry.update();
                 }
 
-                //alignToSkyStone();
-
-                //Move toward first block in line
-                Drive(20, defaultDriveSpeed, defaultPauseTime);
-
-                //Lower arm
-                LowerArm(7 ,defaultPauseTime);
-
                 //Close claw to grab block
-                claw.setPosition(1);
+                claw.setPosition(0);
 
-                //Raise arm slightly
-                RaiseArm(2,defaultPauseTime);
 
-                //Reverse
-                Drive(-24,defaultDriveSpeed,defaultPauseTime);
+                //Strafe past line with block
+                Strafe((int) (allianceReverser*(-72+currentStrafePosition)),defaultDriveSpeed,defaultPauseTime);
 
-                //Turn towards line
-                Turn(allianceReverser * -90,0.1,defaultPauseTime);
-
-                //Drive past line with block
-                Drive(48,defaultDriveSpeed,defaultPauseTime);
-
+                //Strafe back to start
+                Strafe(allianceReverser*72,defaultDriveSpeed,defaultPauseTime);
             }
             else if (pathToRun=="DepotSampleAudienceWall"){
 
