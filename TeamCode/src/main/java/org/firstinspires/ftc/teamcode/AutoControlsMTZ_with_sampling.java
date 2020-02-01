@@ -408,7 +408,7 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
         HooksUp();
     }
 
-    public string determineSkyStone(){
+    public int determineSkyStone(){
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
@@ -488,11 +488,12 @@ public class AutoControlsMTZ_with_sampling extends LinearOpMode {
                 sleep(500);
             }
             telemetry.update();
-        }
 
+        }
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
 
+        return 2;
     }
 
     //Motion Methods

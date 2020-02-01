@@ -61,7 +61,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
-        autoPaths("Red","FoundationSampleWall",false);
+        autoPaths("Red","DepotSampleWall",false);
 
     }
 
@@ -226,7 +226,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Robot is using Depot Wall v0.1");
+            telemetry.log().add("Line up in front of second stone from bridge facing quarry v0.1");
 
             waitForStart();
 
