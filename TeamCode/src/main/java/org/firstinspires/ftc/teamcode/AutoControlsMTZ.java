@@ -5,9 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name ="Auto Controls v.45 Spearmint", group = "z_test")
+@Autonomous(name ="Auto Controls v44 Paprika", group = "z_test")
 
 //@Disabled
 
@@ -217,31 +216,6 @@ public class AutoControlsMTZ extends LinearOpMode {
 
             //Park
             Strafe(allianceReverser * -24,defaultDriveSpeed,0);
-
-        } else {
-
-            /************************************
-             * Path Selection Error
-             ***********************************/
-
-            //Robot Setup Notes
-            telemetry.log().add("Error in Path Selection");
-
-            telemetry.update();
-
-            if (alliance=="Blue") {
-                pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
-            } else if (alliance=="Red") {
-                pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
-            }
-            blinkinLedDriver.setPattern(pattern);
-
-            waitForStart();
-
-            /************
-             * Path Start
-             ************/
-            sleep(30000);
 
         }
     }

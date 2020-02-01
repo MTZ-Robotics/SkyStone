@@ -472,24 +472,24 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         //if Red alliance and location = right, then position 3
 
         int skyStonePosition = 2;
-        string skyStoneLocation = determineSkyStone();
+        int skyStoneLocation = determineSkyStone();
 
-        if (skyStoneLocation == "Left") {
+        if (skyStoneLocation == 1) {
             pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
             blinkinLedDriver.setPattern(pattern);
-            if (alliance == "Blue") { skyStonePosition = 3;
+            if (allianceReverser == 1) { skyStonePosition = 3;
             } else {                  skyStonePosition = 1;
             }
 
-        } else if (skyStoneLocation == "Center") {
+        } else if (skyStoneLocation == 2) {
             pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
             blinkinLedDriver.setPattern(pattern);
             skyStonePosition = 2;
 
-        } else if (skyStoneLocation == "Right") {
+        } else if (skyStoneLocation == 3) {
             pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
             blinkinLedDriver.setPattern(pattern);
-            if (alliance == "Blue") { skyStonePosition = 1;
+            if (allianceReverser == 1) { skyStonePosition = 1;
             } else {                  skyStonePosition = 3;
             }
         }
@@ -513,7 +513,6 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
             Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
         }
     }
-    }
 
     public void quarryToMovedFoundation (int allianceReverser) throws InterruptedException{
         /*********
@@ -530,10 +529,12 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     }
     //Sampling Methods
 
-    public string determineSkyStone() throws InterruptedException {
-        return "Center"
+    public int determineSkyStone() throws InterruptedException {
+        // Left = 1
+        //Center = 2
+        //Right = 3
+        return 2;
     }
-
     //Motion Methods
 
     public void Drive(int distance, double motorPower, int pause) throws InterruptedException {
@@ -693,8 +694,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
 //Distance Calculation Methods
 
     public void DriveByInches(int distance) {
-        private double calibrationMeasurement = 1.00;
-        private double correctedDistance = (distance*(strafeDistanceAdjustment));
+        double correctedDistance = (distance*(strafeDistanceAdjustment));
         frontLeft.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
         frontRight.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
         backLeft.setTargetPosition((int)(-1 * correctedDistance * conversionTicksToInches));
@@ -702,7 +702,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     }
 
     public void StrafeByInches(int distance) {
-        private double correctedDistance = distanceistance*(strafeDistanceAdjustment);
+        double correctedDistance = distance*(strafeDistanceAdjustment);
         frontLeft.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
         frontRight.setTargetPosition((int)(-correctedDistance * conversionTicksToInches));
         backLeft.setTargetPosition((int)(correctedDistance * conversionTicksToInches));
@@ -716,7 +716,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         backRight.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
     }
     public void RaiseByInches(int distance) {
-        private int correctedDistance = (int)(distance*(armDistanceAdjustment));
+        int correctedDistance = (int)(distance*(armDistanceAdjustment));
         arm.setTargetPosition(correctedDistance);
     }
 
