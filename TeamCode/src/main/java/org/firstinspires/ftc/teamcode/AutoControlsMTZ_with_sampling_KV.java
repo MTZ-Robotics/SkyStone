@@ -102,7 +102,7 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
      ******************* Default opMode Settings   *******************************************
      ****************************************************************************************/
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","DepotSampleWall",false);
+        autoPaths("Red'","DepotSampleWall",false);
     }
 
     public void autoPaths(String alliance,String pathToRun,Boolean supportArm) throws InterruptedException {
@@ -331,29 +331,32 @@ public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
 
                 targetsSkyStone.activate();
 
+                claw.setPosition(1);
+
                 targetVisible = false;
                 double currentStrafePosition = 0;
-                while (!isStopRequested() && targetVisible == false && currentStrafePosition < 40) {
-                    currentStrafePosition = frontLeft.getCurrentPosition() / 5.7934;
-                    Strafe(allianceReverser*-40,0.05,100);
+                while (!isStopRequested() && targetVisible == false) {
                     for (VuforiaTrackable trackable : allTrackables) {
                         if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible() && trackable.getName()=="Stone Target") {
                             telemetry.addData("Visible Target", trackable.getName());
                             targetVisible = true;
                             break;
+                        } else {
+                            Strafe(8,0.1,0);
                         }
                     }
                 }
 
+                Drive(8,0.1,50);
+
                 //Close claw to grab block
                 claw.setPosition(0);
 
+                RaiseArm(10,50);
 
-                //Strafe past line with block
-                Strafe((int) (allianceReverser*(-72+currentStrafePosition)),defaultDriveSpeed,defaultPauseTime);
+                Drive(-8,0.1,50);
 
-                //Strafe back to start
-                Strafe(allianceReverser*72,defaultDriveSpeed,defaultPauseTime);
+                Strafe(-48,0.25,50);
             }
             else if (pathToRun=="DepotSampleAudienceWall"){
 

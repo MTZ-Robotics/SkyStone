@@ -1,24 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls v20 sage", group ="z_COPY")
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_2 extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -137,11 +130,11 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
          * Set positions on initialize
          **********************************/
 
-        /*claw.setPosition(1);
+        claw.setPosition(1);
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
-        wrist.setPosition(.5);*/
+        wrist.setPosition(.5);
 
         /***********************************************
          * Tell driver station that initialization complete
@@ -234,11 +227,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
                 arm.setPower( armPower * (gamepad2.left_stick_y) - 0.2 );
             } else {
 
-               if(gamepad2.left_stick_y < 0) {
-                   arm.setPower(armPower * (gamepad2.left_stick_y));
-               } else {
-                   arm.setPower(0.75 * armPower * (gamepad2.left_stick_y));
-               }
+                arm.setPower( armPower * (gamepad2.left_stick_y) );
             }
 
             armExtension.setPower((gamepad2.left_stick_x));

@@ -226,7 +226,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Line up in front of second stone from bridge facing quarry v0.1");
+            telemetry.log().add("Line up in front of second stone from bridge facing quarry");
 
             waitForStart();
 

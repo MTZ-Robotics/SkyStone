@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls OLD", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls v19 sugar", group ="A_Top")
 
 @Disabled
 
