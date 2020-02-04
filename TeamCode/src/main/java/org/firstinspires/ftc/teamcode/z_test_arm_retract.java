@@ -72,7 +72,7 @@ public class z_test_arm_retract extends LinearOpMode {
          */
 
         armPower = 1.0;
-        armExtensionPower = 1;
+        armExtensionPower = 0.5;
         arm = hardwareMap.dcMotor.get("arm");
         armExtension = hardwareMap.dcMotor.get("armExtension");
         //claw = hardwareMap.servo.get("claw");

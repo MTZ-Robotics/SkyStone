@@ -71,7 +71,7 @@ public class z_test_arm_raise extends LinearOpMode {
          *
          */
 
-        armPower = 1.0;
+        armPower = 0.5;
         armExtensionPower = 1;
         arm = hardwareMap.dcMotor.get("arm");
         armExtension = hardwareMap.dcMotor.get("armExtension");

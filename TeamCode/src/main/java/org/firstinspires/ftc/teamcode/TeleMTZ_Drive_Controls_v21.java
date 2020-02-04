@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls_Jake", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls v21 Salt", group ="A_Top")
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls_Jake extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v21 extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -63,7 +63,7 @@ public class TeleMTZ_Drive_Controls_Jake extends LinearOpMode {
     //This is the opMode call for generically running the opMode in this super class
     public void runOpMode() {
 
-        boolean rightStrafer = false;
+        boolean rightStrafer = true;
         boolean spurGearArm = false;
         double driveSpeed = 0.5;
         telemetry.log().add("Strafe Right:"+rightStrafer+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
@@ -168,7 +168,7 @@ public class TeleMTZ_Drive_Controls_Jake extends LinearOpMode {
             if (gamepad1.right_trigger > 0) {
                 drivePower = defaultDrivePower*2;
             } else if (gamepad1.left_trigger > 0) {
-                drivePower = defaultDrivePower * 0.7;
+                drivePower = defaultDrivePower/2;
                 } else {
                     drivePower = defaultDrivePower;
             }

@@ -1,17 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.view.View;
+
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls v20 sage", group ="z_COPY")
+@TeleOp(name="TeleMTZ_Drive_Controls v19 sugar", group ="A_Top")
 
-//@Disabled
+@Disabled
 
-public class TeleMTZ_Drive_Controls_2 extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v19 extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -28,6 +31,7 @@ public class TeleMTZ_Drive_Controls_2 extends LinearOpMode {
     boolean yellowTimerElapsed;
     boolean redTimerElapsed;
     boolean endGameStartElapsed;
+    View relativeLayout;
 
     /***********
      * Lights Control Declarations
@@ -86,7 +90,6 @@ public class TeleMTZ_Drive_Controls_2 extends LinearOpMode {
         yellowWarningTime = 70;
         redWarningTime = 80;
         defaultArmPower = 0.75;
-        double wristPositionDesired = 0.5;
 
         /***************
          * Set Timer Variables
@@ -134,7 +137,7 @@ public class TeleMTZ_Drive_Controls_2 extends LinearOpMode {
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
-        wrist.setPosition(.5);
+        wrist.setPosition(0);
 
         /***********************************************
          * Tell driver station that initialization complete
@@ -242,21 +245,14 @@ public class TeleMTZ_Drive_Controls_2 extends LinearOpMode {
              * Wrist Controls
              *************/
 
-            //wrist.setPosition(gamepad2.right_stick_x);
-            if (gamepad2.right_bumper) {
-                wristPositionDesired = wristPositionDesired - 0.01;
-            } else if (gamepad2.left_bumper) {
-                wristPositionDesired = wristPositionDesired + 0.01;
-            }
-
-            wrist.setPosition(wristPositionDesired);
+            wrist.setPosition(gamepad2.right_stick_x);
 
             /************************
              * Cap Stone thrower controls
              ***********************/
 
             if(gamepad2.a){
-                blockThrower.setPosition(0.55);
+                blockThrower.setPosition(0.45);
             } else {
                 blockThrower.setPosition(1);
             }

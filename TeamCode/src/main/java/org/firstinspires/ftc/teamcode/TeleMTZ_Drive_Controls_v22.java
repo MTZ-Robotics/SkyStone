@@ -1,20 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.view.View;
-
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls v19 sugar", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_v22 Pepper", group ="A_Top")
 
-@Disabled
+//@Disabled
 
-public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v22 extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -31,7 +28,6 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
     boolean yellowTimerElapsed;
     boolean redTimerElapsed;
     boolean endGameStartElapsed;
-    View relativeLayout;
 
     /***********
      * Lights Control Declarations
@@ -67,7 +63,7 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
     //This is the opMode call for generically running the opMode in this super class
     public void runOpMode() {
 
-        boolean rightStrafer = true;
+        boolean rightStrafer = false;
         boolean spurGearArm = false;
         double driveSpeed = 0.5;
         telemetry.log().add("Strafe Right:"+rightStrafer+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
@@ -90,6 +86,7 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
         yellowWarningTime = 70;
         redWarningTime = 80;
         defaultArmPower = 0.75;
+        double wristPositionDesired = 0.5;
 
         /***************
          * Set Timer Variables
@@ -133,11 +130,11 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
          * Set positions on initialize
          **********************************/
 
-        claw.setPosition(1);
+        /*claw.setPosition(1);
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         blockThrower.setPosition(1);
-        wrist.setPosition(0);
+        wrist.setPosition(.5);*/
 
         /***********************************************
          * Tell driver station that initialization complete
@@ -171,7 +168,7 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
             if (gamepad1.right_trigger > 0) {
                 drivePower = defaultDrivePower*2;
             } else if (gamepad1.left_trigger > 0) {
-                drivePower = defaultDrivePower/2;
+                drivePower = defaultDrivePower * 0.7;
                 } else {
                     drivePower = defaultDrivePower;
             }
@@ -230,7 +227,11 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
                 arm.setPower( armPower * (gamepad2.left_stick_y) - 0.2 );
             } else {
 
-                arm.setPower( armPower * (gamepad2.left_stick_y) );
+               if(gamepad2.left_stick_y < 0) {
+                   arm.setPower(armPower * (gamepad2.left_stick_y));
+               } else {
+                   arm.setPower(0.75 * armPower * (gamepad2.left_stick_y));
+               }
             }
 
             armExtension.setPower((gamepad2.left_stick_x));
@@ -245,14 +246,21 @@ public class TeleMTZ_Drive_Controls_old extends LinearOpMode {
              * Wrist Controls
              *************/
 
-            wrist.setPosition(gamepad2.right_stick_x);
+            //wrist.setPosition(gamepad2.right_stick_x);
+            if (gamepad2.right_bumper) {
+                wristPositionDesired = wristPositionDesired - 0.01;
+            } else if (gamepad2.left_bumper) {
+                wristPositionDesired = wristPositionDesired + 0.01;
+            }
+
+            wrist.setPosition(wristPositionDesired);
 
             /************************
              * Cap Stone thrower controls
              ***********************/
 
             if(gamepad2.a){
-                blockThrower.setPosition(0.45);
+                blockThrower.setPosition(0.55);
             } else {
                 blockThrower.setPosition(1);
             }

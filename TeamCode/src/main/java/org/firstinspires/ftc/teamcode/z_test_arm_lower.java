@@ -71,7 +71,7 @@ public class z_test_arm_lower extends LinearOpMode {
          *
          */
 
-        armPower = 1.0;
+        armPower = 0.25;
         armExtensionPower = 1;
         arm = hardwareMap.dcMotor.get("arm");
         armExtension = hardwareMap.dcMotor.get("armExtension");

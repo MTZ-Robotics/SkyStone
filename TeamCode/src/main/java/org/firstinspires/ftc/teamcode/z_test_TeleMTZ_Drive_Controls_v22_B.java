@@ -1,24 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.TeleMTZ_Lights_Timer;
 
-@TeleOp(name="TeleMTZ_Drive_Controls v21 Salt", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_v22", group ="A_Top")
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls extends LinearOpMode {
+public class z_test_TeleMTZ_Drive_Controls_v22_B extends LinearOpMode {
 
     /********************************
      * Timer Variables
@@ -70,7 +64,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
     //This is the opMode call for generically running the opMode in this super class
     public void runOpMode() {
 
-        boolean rightStrafer = true;
+        boolean rightStrafer = false;
         boolean spurGearArm = false;
         double driveSpeed = 0.5;
         telemetry.log().add("Strafe Right:"+rightStrafer+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
@@ -86,30 +80,15 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
         /***********************
          * Modifiable variables
          **********************/
-        endGameStart = 90;
-        endGameWarning = endGameStart + 15;
-        endGameOver = endGameStart + 30;
-        greenWarningTime = 60;
-        yellowWarningTime = 70;
-        redWarningTime = 80;
+
         defaultArmPower = 0.75;
         double wristPositionDesired = 0.5;
 
-        /***************
-         * Set Timer Variables
-         ***************/
-        greenTimerElapsed = false;
-        yellowTimerElapsed = false;
-        redTimerElapsed = false;
-        endGameStartElapsed = false;
 
         /*************
          * Set Lights Variables
          *************/
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
-
-        pattern = RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED;
-        blinkinLedDriver.setPattern(pattern);
+        //teleMTZ_Lights_Timer.lightsTimer("Red", "TeleOp Competition");
 
         /*******************************
          * Set Motor & Servo Variables
@@ -175,7 +154,7 @@ public class TeleMTZ_Drive_Controls extends LinearOpMode {
             if (gamepad1.right_trigger > 0) {
                 drivePower = defaultDrivePower*2;
             } else if (gamepad1.left_trigger > 0) {
-                drivePower = defaultDrivePower/2;
+                drivePower = defaultDrivePower * 0.7;
                 } else {
                     drivePower = defaultDrivePower;
             }
