@@ -49,7 +49,7 @@ import java.util.Locale;
  * Concept: uses imu gyro to drive
  */
 @TeleOp(name = "Gyro Test", group = "Test")
-@Disabled                            // Comment this out to add to the opmode list
+//@Disabled                            // Comment this out to add to the opmode list
 public class z_test_GyroTest extends LinearOpMode {
 
     // Declare the IMU sensor object and telemetry states
