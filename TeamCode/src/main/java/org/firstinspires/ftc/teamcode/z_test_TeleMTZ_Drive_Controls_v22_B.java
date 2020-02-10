@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.TeleMTZ_Lights_Timer;
 
-@TeleOp(name="TeleMTZ_Drive_Controls_v22", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_v22B", group ="A_Top")
 
 //@Disabled
 
