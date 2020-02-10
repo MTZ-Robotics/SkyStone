@@ -1,17 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@TeleOp(name="Right Strafe New Arm", group ="A_Top")
+@TeleOp(name="Hand Turkey Right Strafe", group ="A_Top")
 
 //@Disabled
 
-public class TeleRightStrafeNewArm extends TeleMTZ_Drive_Controls {
+public class TeleHandTurkeyRightStrafe extends TeleMTZ_Drive_Controls {
 
 
     public void runOpMode() {
-        String controlPadMap = "SkyStone Right Strafe";
+        String controlPadMap = "SkyStone Hand Turkey Right Strafe";
         boolean spurGearArm = false;
         double driveSpeed = 0.5;
         telemetry.log().add("Controls Map:"+controlPadMap+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);
