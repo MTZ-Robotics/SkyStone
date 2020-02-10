@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 //@Disabled
 
-public class _z_test_TeleControlsMTZ23 extends LinearOpMode {
+public class z_test_TeleControlsMTZ23 extends LinearOpMode {
 
 
     /**************
