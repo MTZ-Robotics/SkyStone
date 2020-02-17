@@ -20,6 +20,15 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.*;
 public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
     /********************************
+     * Robot Configuration Flags
+     ********************************/
+    boolean accountForArmDrift;
+    boolean hasChassisMotors;
+    boolean hasArmMotorsAndServos;
+    boolean hasExpansionHubConnected;
+    boolean hasLightsHub;
+
+    /********************************
      * Timer Variables
      ********************************/
     private ElapsedTime endGameTimer;
@@ -65,7 +74,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
     double verticalDesired;
     double horizontalDesired;
     double stackDegreesDesired;
-    double wristPositionDesired = wristConversionToServo(90);
+    double wristPositionDesired = wristConversionToServo(90+armRotationDegreesAtHome);
 
 
     /*******
@@ -150,7 +159,12 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
     //This is the method that handles the controls
     public void controlRobot(String controlPadMap, Boolean supportArm, Double defaultDrivePower) throws InterruptedException {
 
-        boolean accountForArmDrift = supportArm;
+        // Robot Configuration Flags
+        accountForArmDrift = supportArm;
+        hasChassisMotors = true;
+        hasArmMotorsAndServos = true;
+        hasExpansionHubConnected = true;
+        hasLightsHub = true;
 
         /***********************
          * Modifiable variables
@@ -174,33 +188,43 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
         /*************
          * Set Lights Variables
          *************/
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+       if(hasLightsHub) {
+           blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        pattern = RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED;
-        blinkinLedDriver.setPattern(pattern);
+           pattern = RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED;
+           blinkinLedDriver.setPattern(pattern);
+       }
 
         /*******************************
          * Set Motor & Servo Variables
          ******************************/
+        if(hasChassisMotors){
+            frontLeft = hardwareMap.dcMotor.get("frontLeft");
+            frontRight = hardwareMap.dcMotor.get("frontRight");
+            backLeft = hardwareMap.dcMotor.get("backLeft");
+            backRight = hardwareMap.dcMotor.get("backRight");
+            frontLeft.setDirection(DcMotor.Direction.REVERSE);
+            backRight.setDirection(DcMotor.Direction.REVERSE);
+        }
+        if(hasArmMotorsAndServos){
+            arm = hardwareMap.dcMotor.get("arm");
+            armExtension = hardwareMap.dcMotor.get("armExtension");
+            claw = hardwareMap.servo.get("claw");
+            wrist = hardwareMap.servo.get("wrist");
+            rightHook = hardwareMap.servo.get("rightHook");
+            leftHook = hardwareMap.servo.get("leftHook");
+            blockThrower = hardwareMap.servo.get("blockThrower");
 
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        backLeft = hardwareMap.dcMotor.get("backLeft");
-        backRight = hardwareMap.dcMotor.get("backRight");
-        arm = hardwareMap.dcMotor.get("arm");
-        armExtension = hardwareMap.dcMotor.get("armExtension");
-        claw = hardwareMap.servo.get("claw");
-        wrist = hardwareMap.servo.get("wrist");
-        rightHook = hardwareMap.servo.get("rightHook");
-        leftHook = hardwareMap.servo.get("leftHook");
-        blockThrower = hardwareMap.servo.get("blockThrower");
+            armExtension.setDirection(DcMotor.Direction.REVERSE);
+            leftHook.setDirection(Servo.Direction.REVERSE);
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
-        armExtension.setDirection(DcMotor.Direction.REVERSE);
-        leftHook.setDirection(Servo.Direction.REVERSE);
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            armExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //arm.setDirection(DcMotor.Direction.REVERSE);
+        }
 
-        //arm.setDirection(DcMotor.Direction.REVERSE);
 
         /**********************************
          * Do Not set positions on initialize
@@ -210,7 +234,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
         /***********************************************
          * Tell driver station that initialization complete
          **********************************************/
-        telemetry.log().add("Initialized. Go MTZ! Timer Set for ");
+        telemetry.log().add("Initialized. Go MTZ! Be Sure to Home Arm. Timer Set for ");
 
         telemetry.log().add(greenWarningTime+" s, " +
                 yellowWarningTime+" s, " +
@@ -221,10 +245,10 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
         /************* Press Play Button ***********************/
 
         waitForStart();
-
-        pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
-        blinkinLedDriver.setPattern(pattern);
-
+        if(hasLightsHub) {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+            blinkinLedDriver.setPattern(pattern);
+        }
         //Start timer here since play was just pressed
         endGameTimer = new ElapsedTime();
         endGameTimer.reset();
@@ -239,7 +263,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
             if (controlPadMap=="SkyStone Hunchamuncha Left Strafe") {
 
-/*************           SkyStone Hunchamuncha Left Strafe     Controls Update Status           **************/
+                /*************           SkyStone Hunchamuncha Left Strafe     Controls Update Status           **************/
                 chassisSpeedSlow = gamepad1.left_trigger;             //Slow Speed
                 chassisBumpLeftTurnStatus.update(gamepad1.left_bumper);             //Bump Left Turn
 
@@ -296,9 +320,9 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
                 handAssist = gamepad2.right_stick_y;             //Ride Height/Drop to 0
                 stoneReleaseStick = gamepad2.right_stick_x;             //Release Stone (RL Flick)
-/*************           End     SkyStone Hunchamuncha Left Strafe     Updates            **************/
+                /*************           End     SkyStone Hunchamuncha Left Strafe     Updates            **************/
             } else if (controlPadMap=="SkyStone Hand Turkey Right Strafe") {
-/*************           SkyStone Hand Turkey Right Strafe     Controls Update Status           **************/
+                /*************           SkyStone Hand Turkey Right Strafe     Controls Update Status           **************/
                 chassisSpeedSlow = gamepad1.left_trigger;             //Slow Speed
                 chassisBumpLeftTurnStatus.update(gamepad1.left_bumper);             //Bump Left Turn
 
@@ -355,10 +379,10 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
                 handAssist = gamepad2.right_stick_y;             //Ride Height/Drop to 0
                 stoneReleaseStick = gamepad2.right_stick_x;             //Release Stone (RL Flick)
-/*************           End     SkyStone Hand Turkey Right Strafe     Updates            **************/
+                /*************           End     SkyStone Hand Turkey Right Strafe     Updates            **************/
             } else if (controlPadMap=="SkyStone Right Strafe") {
 
-/*************           SkyStone Right Strafe     Controls Update Status           **************/
+                /*************           SkyStone Right Strafe     Controls Update Status           **************/
                 chassisSpeedSlow = gamepad1.left_trigger;             //Slow Speed
 
 
@@ -415,10 +439,10 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
                 clawClose = gamepad2.right_stick_y;             //Claw
 
-/*************           End     SkyStone Right Strafe     Updates            **************/
+                /*************           End     SkyStone Right Strafe     Updates            **************/
             } else if (controlPadMap=="SkyStone Left Strafe") {
 
-/*************           SkyStone Left Strafe     Controls Update Status           **************/
+                /*************           SkyStone Left Strafe     Controls Update Status           **************/
                 chassisSpeedSlow = gamepad1.left_trigger;             //Slow Speed
 
 
@@ -475,13 +499,13 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
                 clawClose = gamepad2.right_stick_y;             //Claw
 
-/*************           End     SkyStone Left Strafe     Updates            **************/
-            }else {
+                /*************           End     SkyStone Left Strafe     Updates            **************/
+            } else {
                 /************************************
                  * Control Pad Map Selection Error
                  ***********************************/
                 telemetry.log().add("Error in Control Map Selection"); telemetry.update();
-                pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED; blinkinLedDriver.setPattern(pattern);
+                if(hasLightsHub){pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED; blinkinLedDriver.setPattern(pattern);}
                 waitForStart(); sleep(30000);
             }
 
@@ -508,13 +532,12 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
             /*************************
              * Chassis drive controls
              *************************/
-
-            backLeft.setPower(drivePower * ((driveStick1 + strafeStick) - turnStick));
-            backRight.setPower(drivePower * ((driveStick1 - strafeStick) + turnStick));
-            frontLeft.setPower(drivePower * ((-driveStick1 + strafeStick) + turnStick));
-            frontRight.setPower(drivePower * ((-driveStick1 - strafeStick) - turnStick));
-
-
+            if(hasChassisMotors) {
+                backLeft.setPower(drivePower * ((driveStick1 + strafeStick) - turnStick));
+                backRight.setPower(drivePower * ((driveStick1 - strafeStick) + turnStick));
+                frontLeft.setPower(drivePower * ((-driveStick1 + strafeStick) + turnStick));
+                frontRight.setPower(drivePower * ((-driveStick1 - strafeStick) - turnStick));
+            }
             /*************************
              * Chassis bump controls
              *************************/
@@ -528,56 +551,50 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
             /*************
              * Arm Controls
              *************/
+            if(hasArmMotorsAndServos) {
+                if (accountForArmDrift) {
+                    arm.setPower(-1 * (defaultArmPower * (handVerticalStick) - 0.2));
+                } else {
 
-            if (accountForArmDrift) {
-                arm.setPower( -1 * (defaultArmPower * (handVerticalStick) - 0.2) );
-            } else {
+                    if (handVerticalStick > 0) {
+                        arm.setPower(defaultArmPower * (-handVerticalStick));
+                    } else {
+                        arm.setPower(defaultArmLowerPower * (-handVerticalStick));
+                    }
+                }
 
-               if(handVerticalStick < 0) {
-                   arm.setPower(defaultArmPower * (-handVerticalStick));
-               } else {
-                   arm.setPower(0.75 * defaultArmPower * (-handVerticalStick));
-               }
+                armExtension.setPower((handHorizontalStick));
             }
-
-            armExtension.setPower((handHorizontalStick));
-
             if (handVerticalStick!=0){
                 stackLevel = -1;
             }
             if (handHorizontalStick!=0){
                 stackDistance = -1;
             }
-            /*************
-             * Claw Controls
-             *************/
 
-            if(clawClose>0.9){clawRemainClosed = true; }
-            if(clawOpen>0.9){clawRemainClosed = false;}
-            if(clawRemainClosed){
-                claw.setPosition(clawClosedPosition);
-            } else {
-                    claw.setPosition(clawOpenPosition-clawClose-clawOpen);
+            //handAssist
+            if(handAssist<=-0.9){
+                //Ride Height Desired
+                stackLevel = handAssistRideHeightLevel;
+                stackDistance = handAssistRideHeightDistance;
+                aboveLevel = handAssistRideHeightAboveLevel;
+                goToStackPosition(false,stackLevel,stackDistance,aboveLevel);
             }
-
-
-            /************************
-             * Cap Stone thrower controls
-             ***********************/
-
-            if(blockThrowerButtonStatus.isDown){
-                blockThrower.setPosition(blockThrowerDownPosition);
-            } else {
-                blockThrower.setPosition(blockThrowerUpPosition);
+            if(handAssist>=0.9){
+                // Zero Height Desired
+                stackLevel = 0;
+                stackDistance = 0;
+                aboveLevel = false;
+                goToStackPosition(false,stackLevel,stackDistance,aboveLevel);
             }
-
 
             /************************
              * Stacker Controls
              ***********************/
-            armRotationDegrees = arm.getCurrentPosition()/ticksPerDegreeArm;
-            armExtensionInches = armExtension.getCurrentPosition()/ticksPerInchExtension;
-
+            if(hasArmMotorsAndServos) {
+                armRotationDegrees = (arm.getCurrentPosition() / ticksPerDegreeArm) + armRotationDegreesAtHome;
+                armExtensionInches = armExtension.getCurrentPosition() / ticksPerInchExtension - armExtensionInchesAtHome;
+            }
 
             if(stackLevelUpStatus.clickedDown){
                 stackingDown=false;
@@ -613,10 +630,35 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                 goToStackPosition(stackingDown,stackLevel,stackDistance,aboveLevel);
             }
 
+
+            /*************
+             * Claw Controls
+             *************/
+
+            if(clawClose>0.95){clawRemainClosed = true; }
+            if(clawOpen>0.95){clawRemainClosed = false;}
+            if(hasArmMotorsAndServos) {
+                if (clawRemainClosed) {
+                    claw.setPosition(clawClosedPosition);
+                } else {
+                    claw.setPosition(clawOpenPosition - clawClose - clawOpen);
+                }
+            }
+
+            /************************
+             * Cap Stone thrower controls
+             ***********************/
+            if(hasArmMotorsAndServos) {
+                if (blockThrowerButtonStatus.isDown) {
+                    blockThrower.setPosition(blockThrowerDownPosition);
+                } else {
+                    blockThrower.setPosition(blockThrowerUpPosition);
+                }
+            }
+
             /*************
              * Wrist Controls
              *************/
-
             if (wristAdjustLessStatus.clickedDown) {
                 wristPositionDesired = wristPositionDesired - wristBump;
             } else if (wristAdjustMoreStatus.clickedDown) {
@@ -630,86 +672,100 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
             if(wristPositionDesired > maxWristPosition){
                 wristPositionDesired = maxWristPosition;
             }
-
-            wrist.setPosition(wristPositionDesired);
+            //Set wrist position
+            if(hasArmMotorsAndServos) {
+                wrist.setPosition(wristPositionDesired);
+            }
 
             /*********************************
              * Check if timer has elapsed
              *********************************/
-            //Check for End Timer First
-            if (endGameTimer.seconds()>endGameOver){
-                endGameStartElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
-                blinkinLedDriver.setPattern(pattern);
-            } else if (endGameTimer.seconds()>endGameWarning2){
-                endGameStartElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_RED;
-                blinkinLedDriver.setPattern(pattern);
-            } else if (endGameTimer.seconds()>endGameWarning){
-                endGameStartElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-                blinkinLedDriver.setPattern(pattern);
-            } else if (endGameTimer.seconds()>endGameStart){
-                endGameStartElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
-                blinkinLedDriver.setPattern(pattern);
-            } else if (endGameTimer.seconds()>redWarningTime){ //Then check for red
-                redTimerElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-                blinkinLedDriver.setPattern(pattern);
-            } else if (endGameTimer.seconds()>yellowWarningTime){ //Then check for yellow
-                yellowTimerElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-                blinkinLedDriver.setPattern(pattern);
-            } else if (endGameTimer.seconds()>greenWarningTime){ //Then check for green
-                greenTimerElapsed = true;
-                pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
-                blinkinLedDriver.setPattern(pattern);
+            if(hasLightsHub) {
+                //Check for End Timer First
+                if (endGameTimer.seconds() > endGameOver) {
+                    endGameStartElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (endGameTimer.seconds() > endGameWarning2) {
+                    endGameStartElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_RED;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (endGameTimer.seconds() > endGameWarning) {
+                    endGameStartElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (endGameTimer.seconds() > endGameStart) {
+                    endGameStartElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (endGameTimer.seconds() > redWarningTime) { //Then check for red
+                    redTimerElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (endGameTimer.seconds() > yellowWarningTime) { //Then check for yellow
+                    yellowTimerElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+                    blinkinLedDriver.setPattern(pattern);
+                } else if (endGameTimer.seconds() > greenWarningTime) { //Then check for green
+                    greenTimerElapsed = true;
+                    pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+                    blinkinLedDriver.setPattern(pattern);
+                }
             }
         }
     }
+
+    /*******************************
+     * End of Control Robot Method
+     ******************************/
 
     //Motion Methods
 
     public void Drive(double distance, double motorPower, int pause) throws InterruptedException {
-        if (opModeIsActive()) {
-            StopAndResetDriveEncoders();
-            DriveByInches(distance);
-            RunDriveToPosition();
-            DrivePower(motorPower);
-            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
-                DisplayDriveTelemetry();
+        if(hasChassisMotors) {
+            if (opModeIsActive()) {
+                StopAndResetDriveEncoders();
+                DriveByInches(distance);
+                RunDriveToPosition();
+                DrivePower(motorPower);
+                while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                    DisplayDriveTelemetry();
+                }
+                DrivePower(0);
+                Thread.sleep(pause);
             }
-            DrivePower(0);
-            Thread.sleep(pause);
         }
     }
     public void Strafe(double leftDistance, double power, int pause) throws InterruptedException {
-        //Left is positive
-        if (opModeIsActive()) {
-            StopAndResetDriveEncoders();
-            StrafeByInches(leftDistance);
-            RunDriveToPosition();
-            DrivePower(power);
-            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
-                DisplayDriveTelemetry();
+        if(hasChassisMotors) {
+            //Left is positive
+            if (opModeIsActive()) {
+                StopAndResetDriveEncoders();
+                StrafeByInches(leftDistance);
+                RunDriveToPosition();
+                DrivePower(power);
+                while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                    DisplayDriveTelemetry();
+                }
+                DrivePower(0);
+                Thread.sleep(pause);
             }
-            DrivePower(0);
-            Thread.sleep(pause);
         }
     }
     public void Turn(double rightDegrees, double power, int pause) throws InterruptedException {
-        //Left is negative
-        if (opModeIsActive()) {
-            StopAndResetDriveEncoders();
-            TurnByAngle(rightDegrees);
-            RunDriveToPosition();
-            DrivePower(power);
-            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
-                DisplayDriveTelemetry();
+        if(hasChassisMotors) {
+            //Left is negative
+            if (opModeIsActive()) {
+                StopAndResetDriveEncoders();
+                TurnByAngle(rightDegrees);
+                RunDriveToPosition();
+                DrivePower(power);
+                while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                    DisplayDriveTelemetry();
+                }
+                DrivePower(0);
+                Thread.sleep(pause);
             }
-            DrivePower(0);
-            Thread.sleep(pause);
         }
     }
     public void goToStackPosition(boolean stackingDown,int stackLevel,int stackDistance,boolean aboveLevel) throws InterruptedException {
@@ -738,7 +794,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
             vertRequired = vertDesired - armPivotHeight;
             horDesired = stackDistanceArray[stackDistance];
-            
+
             degreesDesired = Math.toDegrees(Math.asin((vertRequired) / (armLengthDesired(horDesired, vertDesired))));
 
             //Stay in the max & min
@@ -755,48 +811,56 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
             }
             stackDegreesDesired = degreesDesired;
             // Set the target positions to run to
-            armExtension.setTargetPosition((int) (armExtensionInches * ticksPerInchExtension));
             raiseByDegrees(degreesDesired);
             wristPositionDesired = wristAutoLevel(degreesDesired);
             horizontalDesired = horDesired;
             verticalDesired = vertDesired;
+            if(hasArmMotorsAndServos) {
+                armExtension.setTargetPosition((int) ((armExtensionInches - armExtensionInchesAtHome) * ticksPerInchExtension));
 
-            if (opModeIsActive()) {
-                // Turn motors on to let them reach the target if the stop button hasn't been pressed
-                arm.setPower(armSpeed);
-                armExtension.setPower(defaultArmExtensionPower);
-                //wrist.setPosition(wristPositionDesired);
+                if (opModeIsActive()) {
+                    // Turn motors on to let them reach the target if the stop button hasn't been pressed
+                    arm.setPower(armSpeed);
+                    armExtension.setPower(defaultArmExtensionPower);
+                    //Wrist Position is set once so it doesn't try to go to 2 different positions each loop iteration
+                    // wrist.setPosition(wristPositionDesired);
+                    while (arm.isBusy() && armExtension.isBusy()) {
+                        DisplayArmTelemetry();
+                    }
+                }
+
+                arm.setPower(0);
+                armExtension.setPower(0);
             }
-
-            arm.setPower(0);
-            armExtension.setPower(0);
             Thread.sleep(defaultPauseTime);
         }
-
-    }
-    public double armLengthDesired(double horDesired, double vertDesired){
-        double horArmLengthDesired = horDesired + armPivotDistance;
-        double vertArmLengthDesired = vertDesired-armPivotHeight;
-        return Math.sqrt(Math.pow(horArmLengthDesired,2) + Math.pow(vertArmLengthDesired,2));
     }
 
     public void RaiseArm(double degrees, double power,int pause) throws InterruptedException {
-        if (opModeIsActive()) {
-            raiseByDegrees(degrees);
-            ArmPower(power);
+        if(hasArmMotorsAndServos) {
+            if (opModeIsActive()) {
+                raiseByDegrees(degrees);
+                ArmPower(power);
+                while (arm.isBusy() && armExtension.isBusy()) {
+                    DisplayArmTelemetry();
+                }
+            }
+            ArmPower(0);
+            Thread.sleep(pause);
         }
-        ArmPower(0);
-        Thread.sleep(pause);
-
     }
     public void LowerArm(double degrees, double power, int pause) throws InterruptedException {
-        if (opModeIsActive()) {
-            raiseByDegrees(-degrees);
-            ArmPower(power);
+        if(hasArmMotorsAndServos) {
+            if (opModeIsActive()) {
+                raiseByDegrees(-degrees);
+                ArmPower(power);
+                while (arm.isBusy() && armExtension.isBusy()) {
+                    DisplayArmTelemetry();
+                }
+            }
+            ArmPower(0);
+            Thread.sleep(pause);
         }
-        ArmPower(0);
-        Thread.sleep(pause);
-
     }
     public double wristAutoLevel(double armAngle){
                 return wristConversionToServo(armAngle + 90);
@@ -810,62 +874,98 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
             } else if(armExtensionInches>maxArmExtensionInches){
                 armExtensionInches=maxArmExtensionInches;
             }
-            armExtension.setTargetPosition((int) (armExtensionInches * ticksPerInchExtension));
-            armExtension.setPower(power);
+            if(hasArmMotorsAndServos) {
+                armExtension.setTargetPosition((int) (armExtensionInches * ticksPerInchExtension));
+                armExtension.setPower(power);
+
+                while (arm.isBusy() && armExtension.isBusy()) {
+                    DisplayArmTelemetry();
+                }
+            }
         }
-        armExtension.setPower(0);
+        if(hasArmMotorsAndServos){
+            armExtension.setPower(0);
+        }
         Thread.sleep(pause);
     }
     public void HooksDown()throws InterruptedException {
-        //Light Reverse Power On
-        lightReverse();
+        if(hasArmMotorsAndServos) {
+            //Light Reverse Power On
+            leftHook.setPosition(leftHookDownPosition);
+            rightHook.setPosition(rightHookDownPosition);
+            lightReverse();
+            sleep(1500);
 
-        leftHook.setPosition(0);
-        rightHook.setPosition(0);
-        sleep(1500);
-
-        //Reverse Power Off
-        StopAndResetDriveEncoders();
+            //Reverse Power Off
+            StopAndResetDriveEncoders();
+        }
     }
     public void HooksUp() {
-        leftHook.setPosition(0.5);
-        rightHook.setPosition(0.5);
-        sleep(1500);
+        if(hasArmMotorsAndServos) {
+            leftHook.setPosition(leftHookUpPosition);
+            rightHook.setPosition(rightHookUpPosition);
+            sleep(1500);
+        }
+    }
+    public void HooksIn() {
+        if(hasArmMotorsAndServos) {
+            leftHook.setPosition(leftHookInPosition);
+            rightHook.setPosition(rightHookInPosition);
+            sleep(500);
+        }
     }
     public void lightReverse() throws InterruptedException{
-        Drive(-1,0.1,50);
+        if (hasChassisMotors) {
+            Drive(-1,0.1,50);
+        }
     }
 
 
 //Encoder Methods
 
     public void StopAndResetAllEncoders() {
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(hasChassisMotors) {
+            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        if(hasArmMotorsAndServos){
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
     public void StopAndResetDriveEncoders() {
-        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(hasChassisMotors) {
+            frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
     public void StopAndResetArmEncoder() {
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(hasArmMotorsAndServos){
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
     }
     public void RunDriveToPosition() {
-        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if(hasChassisMotors) {
+            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
     }
     public void RunArmToPosition() {
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if(hasArmMotorsAndServos) {
+            arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
     }
     public void RunArm() {
-        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if(hasArmMotorsAndServos) {
+            arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
 
     //End of Encoder Methods
@@ -873,28 +973,36 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 //Distance Calculation Methods
 
     public void DriveByInches(double distance) {
-        frontLeft.setTargetPosition((int)(distance * ticksPerInchWheelDrive));
-        frontRight.setTargetPosition((int)(distance * ticksPerInchWheelDrive));
-        backLeft.setTargetPosition((int)(-1 * distance * ticksPerInchWheelDrive));
-        backRight.setTargetPosition((int)(-1 * distance * ticksPerInchWheelDrive));
+        if(hasChassisMotors) {
+            frontLeft.setTargetPosition((int) (distance * ticksPerInchWheelDrive));
+            frontRight.setTargetPosition((int) (distance * ticksPerInchWheelDrive));
+            backLeft.setTargetPosition((int) (-1 * distance * ticksPerInchWheelDrive));
+            backRight.setTargetPosition((int) (-1 * distance * ticksPerInchWheelDrive));
+        }
     }
 
     public void StrafeByInches(double distance) {
-        frontLeft.setTargetPosition((int)(distance * ticksPerInchWheelStrafe));
-        frontRight.setTargetPosition((int)(-distance * ticksPerInchWheelStrafe));
-        backLeft.setTargetPosition((int)(distance * ticksPerInchWheelStrafe));
-        backRight.setTargetPosition((int)(-distance * ticksPerInchWheelStrafe));
+        if(hasChassisMotors) {
+            frontLeft.setTargetPosition((int) (distance * ticksPerInchWheelStrafe));
+            frontRight.setTargetPosition((int) (-distance * ticksPerInchWheelStrafe));
+            backLeft.setTargetPosition((int) (distance * ticksPerInchWheelStrafe));
+            backRight.setTargetPosition((int) (-distance * ticksPerInchWheelStrafe));
+        }
     }
 
     public void TurnByAngle(double degrees) {
-        frontLeft.setTargetPosition((int)(degrees * ticksPerDegreeTurnChassis));
-        frontRight.setTargetPosition((int)(-degrees * ticksPerDegreeTurnChassis));
-        backLeft.setTargetPosition((int)(-degrees * ticksPerDegreeTurnChassis));
-        backRight.setTargetPosition((int)(degrees * ticksPerDegreeTurnChassis));
+        if(hasChassisMotors) {
+            frontLeft.setTargetPosition((int) (degrees * ticksPerDegreeTurnChassis));
+            frontRight.setTargetPosition((int) (-degrees * ticksPerDegreeTurnChassis));
+            backLeft.setTargetPosition((int) (-degrees * ticksPerDegreeTurnChassis));
+            backRight.setTargetPosition((int) (degrees * ticksPerDegreeTurnChassis));
+        }
     }
 
     public void raiseByDegrees(double degrees) {
-        arm.setTargetPosition((int)(degrees * ticksPerDegreeArm));
+        if(hasArmMotorsAndServos){
+            arm.setTargetPosition((int)((degrees + armRotationDegreesAtHome) * ticksPerDegreeArm));
+        }
     }
 
     //End of distance calculation methods
@@ -902,13 +1010,17 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 //Power Methods
 
     public void DrivePower(double power) {
-        frontLeft.setPower(power);
-        frontRight.setPower(power);
-        backLeft.setPower(power);
-        backRight.setPower(power);
+        if(hasChassisMotors) {
+            frontLeft.setPower(power);
+            frontRight.setPower(power);
+            backLeft.setPower(power);
+            backRight.setPower(power);
+        }
     }
     public void ArmPower(double power) {
-        arm.setPower(power);
+        if(hasArmMotorsAndServos) {
+            arm.setPower(power);
+        }
     }
 //End Power Methods
 
@@ -919,14 +1031,6 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
         telemetry.addLine()
                 .addData("Timer: ", endGameTimer.toString());
         telemetry.addLine()
-                .addData("Front Left Power: ", frontLeft.getPower());
-        telemetry.addLine()
-                .addData("Front Right Power: ", frontRight.getPower());
-        telemetry.addLine()
-                .addData("Back Left Power: ", backLeft.getPower());
-        telemetry.addLine()
-                .addData("Back Right Power: ", backRight.getPower());
-        telemetry.addLine()
                 .addData("Stack Level: ", stackLevel);
         telemetry.addLine()
                 .addData("Stack Distance: ", stackDistance);
@@ -935,55 +1039,71 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
         telemetry.addLine()
                 .addData("Hor Desired: ", horizontalDesired);
         telemetry.addLine()
-                .addData("Arm Ticks: ", arm.getCurrentPosition());
-        telemetry.addLine()
-                .addData("Arm Current Degrees: ", arm.getCurrentPosition()/ticksPerDegreeArm);
-        telemetry.addLine()
                 .addData("Arm Theoretical Degrees: ", armRotationDegrees);
         telemetry.addLine()
                 .addData("Stack Degrees Desired: ", stackDegreesDesired);
         telemetry.addLine()
-                .addData("Arm Extension: ", armExtension.getCurrentPosition());
-        telemetry.addLine()
                 .addData("Arm Length: ", armExtensionInches + armExtensionCollapsedLength);
-        telemetry.addLine()
-                .addData("Claw Position: ", claw.getPosition());
-        telemetry.addLine()
-                .addData("Wrist Position: ", wrist.getPosition());
-        telemetry.addLine()
-                .addData("Left Hook Position: ", leftHook.getPosition());
-        telemetry.addLine()
-                .addData("Right Hook Position: ", rightHook.getPosition());
-        telemetry.addLine()
-                .addData("Block Thrower Position: ", blockThrower.getPosition());
         telemetry.addLine()
                 .addData("ticksPerDegreesArm: ", ticksPerDegreeArm);
         telemetry.addLine()
                 .addData("ticksPerInchExtension: ", ticksPerInchExtension);
+        if(hasChassisMotors && hasArmMotorsAndServos) {
+            telemetry.addLine()
+                    .addData("Front Left Power: ", frontLeft.getPower());
+            telemetry.addLine()
+                    .addData("Front Right Power: ", frontRight.getPower());
+            telemetry.addLine()
+                    .addData("Back Left Power: ", backLeft.getPower());
+            telemetry.addLine()
+                    .addData("Back Right Power: ", backRight.getPower());
+            telemetry.addLine()
+                    .addData("Claw Position: ", claw.getPosition());
+            telemetry.addLine()
+                    .addData("Wrist Position: ", wrist.getPosition());
+            telemetry.addLine()
+                    .addData("Left Hook Position: ", leftHook.getPosition());
+            telemetry.addLine()
+                    .addData("Right Hook Position: ", rightHook.getPosition());
+            telemetry.addLine()
+                    .addData("Block Thrower Position: ", blockThrower.getPosition());
+            telemetry.addLine()
+                    .addData("Arm Extension: ", armExtension.getCurrentPosition());
+            telemetry.addLine()
+                    .addData("Arm Ticks: ", arm.getCurrentPosition());
+            telemetry.addLine()
+                    .addData("Arm Current Degrees: ", arm.getCurrentPosition() / ticksPerDegreeArm);
+        }
         telemetry.update();
     }
     public void DisplayDriveTelemetry() {
-        double frontLeftInches = frontLeft.getCurrentPosition() / ticksPerInchWheelDrive;
-        double frontRightInches = frontRight.getCurrentPosition() / ticksPerInchWheelDrive;
-        double backLeftInches = backLeft.getCurrentPosition() / ticksPerInchWheelDrive;
-        double backRightInches = backRight.getCurrentPosition() / ticksPerInchWheelDrive;
-        telemetry.clear();
-        telemetry.addLine()
-                .addData("Front Left Inches ", (int) frontLeftInches + "   Power: " + "%.1f", frontLeft.getPower());
-        telemetry.addLine()
-                .addData("Front Right Inches: ", (int) frontRightInches + "   Power: " + "%.1f", frontRight.getPower());
-        telemetry.addLine()
-                .addData("Back Left Inches: ", (int) backLeftInches + "   Power: " + "%.1f", backLeft.getPower());
-        telemetry.addLine()
-                .addData("Back Right Inches: ", (int) backRightInches + "   Power: " + "%.1f", backRight.getPower());
-        telemetry.update();
+        if(hasChassisMotors) {
+            double frontLeftInches = frontLeft.getCurrentPosition() / ticksPerInchWheelDrive;
+            double frontRightInches = frontRight.getCurrentPosition() / ticksPerInchWheelDrive;
+            double backLeftInches = backLeft.getCurrentPosition() / ticksPerInchWheelDrive;
+            double backRightInches = backRight.getCurrentPosition() / ticksPerInchWheelDrive;
+            telemetry.clear();
+            telemetry.addLine()
+                    .addData("Front Left Inches ", (int) frontLeftInches + "   Power: " + "%.1f", frontLeft.getPower());
+            telemetry.addLine()
+                    .addData("Front Right Inches: ", (int) frontRightInches + "   Power: " + "%.1f", frontRight.getPower());
+            telemetry.addLine()
+                    .addData("Back Left Inches: ", (int) backLeftInches + "   Power: " + "%.1f", backLeft.getPower());
+            telemetry.addLine()
+                    .addData("Back Right Inches: ", (int) backRightInches + "   Power: " + "%.1f", backRight.getPower());
+            telemetry.update();
+        }
     }
     public void DisplayArmTelemetry() {
-        double armDegrees = arm.getCurrentPosition() / ticksPerDegreeArm;
-        telemetry.clear();
-        telemetry.addLine()
-                .addData("Arm Degrees ", (int) armDegrees + "  Power: " + "%.1f", arm.getPower());
-        telemetry.update();
+        if(hasArmMotorsAndServos) {
+            double armDegrees = arm.getCurrentPosition() / ticksPerDegreeArm;
+            telemetry.clear();
+            telemetry.addLine()
+                    .addData("Arm Degrees ", (int) armDegrees + "  Power: " + "%.1f", arm.getPower());
+            telemetry.addLine()
+                    .addData("Arm Ext Inches ", (int) armExtensionInches + "  Power: " + "%.1f", armExtension.getPower());
+            telemetry.update();
+        }
     }
     //End of Telemetry Methods
     //End of Class

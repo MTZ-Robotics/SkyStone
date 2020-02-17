@@ -5,7 +5,7 @@ public class mtzConstants {
     public static final double driveEfficiency = 1.0;
     public static final double strafeEfficiency = 1.0;
     public static final double turnEfficiency = 91.8;
-    public static final double armRotationEfficiency = 10.0;
+    public static final double armRotationEfficiency = 1.0;
     public static final double armExtensionEfficiency = 1.0;
 // Debug Delay
     public static final int defaultPauseTime = 200;  //Milliseconds after a command
@@ -21,7 +21,7 @@ public class mtzConstants {
     public static double redWarningTime = 80;
 // Powers & Speeds
     public static double defaultArmPower = 0.75;
-    public static double defaultArmLowerPower = 0.75;
+    public static double defaultArmLowerPower = 0.2;
     public static double defaultArmExtensionPower = 1.0;
 
 
@@ -40,10 +40,19 @@ public class mtzConstants {
     public static final double clawClosedPosition = 0;
     public static final double blockThrowerDownPosition = 0.55;
     public static final double blockThrowerUpPosition = 1.0;
-    public static double wristPositionDesired = 0.5;
+    public static final double leftHookUpPosition = 0.5;
+    public static final double rightHookUpPosition = 0.5;
+    public static final double leftHookDownPosition = 0;
+    public static final double rightHookDownPosition = 0;
+    public static final double leftHookInPosition = 0.75;
+    public static final double rightHookInPosition = 0.75;
+    public static final int handAssistRideHeightLevel = 1;
+    public static final int handAssistRideHeightDistance = 1;
+    public static final boolean handAssistRideHeightAboveLevel = true;
+
 
 // Adjustments for where home is for the hand
-    public static final double armRotationDegreesAtHome = -16.0;
+    public static final double armRotationDegreesAtHome = -45.0;
     public static final double armExtensionInchesAtHome = 2.0;
     public static final int stackDistanceAtHome = 0;
     public static final int stackLevelAtHome = 0;
@@ -51,11 +60,15 @@ public class mtzConstants {
     public static final double armPivotHeight = 14;
     public static final double armPivotDistance = 14;
 
+// Adjustments for hand position
+    public static final double handHorizontalAdjustment = 0;
+    public static final double handVerticalAdjustment = 0;
+
 //Max Ranges
     public static final double minArmExtensionInches = 0;
     public static final double maxArmExtensionInches = 200/25.4; //200mm stroke
-    public static final double minArmDegrees = -16;
-    public static final double maxArmDegrees = 50;
+    public static final double minArmDegrees = -60;
+    public static final double maxArmDegrees = 70;
     public static final double minWristPosition = 0.5;
     public static final double maxWristPosition = 0.85;
 
@@ -80,6 +93,13 @@ public class mtzConstants {
 
     public static final double ticksPerDegreeArm = armRotationEfficiency * (ticksPerRevolution435 /360 ) * gearReductionArm;
     public static final double ticksPerInchExtension = armExtensionEfficiency * ticksPerRevolution435 * gearReductionExtensionSpur / translationInchPerRotationExtensionScrew;
+
+    //conversion methods
+    public static double armLengthDesired(double horDesired, double vertDesired){
+        double horArmLengthDesired = horDesired + armPivotDistance;
+        double vertArmLengthDesired = vertDesired - armPivotHeight;
+        return Math.sqrt(Math.pow(horArmLengthDesired,2) + Math.pow(vertArmLengthDesired,2));
+    }
 
     public static double wristConversionToServo(double angle){
         double servoPosition = 0.5;
