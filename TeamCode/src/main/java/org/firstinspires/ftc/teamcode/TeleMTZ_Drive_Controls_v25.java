@@ -7,23 +7,23 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls_v24 Turmeric", group ="A_Top")
+import static org.firstinspires.ftc.teamcode.mtzConstants.*;
+
+
+@TeleOp(name="TeleMTZ_Drive_Controls_v25 Ginger", group ="A_Top")
+
+//Adds run to position to controls map
+//Adds control map error handling
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
     /********************************
      * Timer Variables
      ********************************/
     private ElapsedTime endGameTimer;
 
-    double greenWarningTime;
-    double yellowWarningTime;
-    double redWarningTime;
-    double endGameStart;
-    double endGameOver;
-    double endGameWarning;
     boolean greenTimerElapsed;
     boolean yellowTimerElapsed;
     boolean redTimerElapsed;
@@ -53,8 +53,19 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
     private Servo wrist;
 
     double drivePower;
-    double armPower;
-    double defaultArmPower;
+
+    boolean clawRemainClosed;
+    boolean aboveLevel = false;
+    boolean stackingDown;
+
+    int stackLevel = stackLevelAtHome;
+    int stackDistance = stackDistanceAtHome;
+    double armRotationDegrees = armRotationDegreesAtHome;
+    double armExtensionInches = armExtensionInchesAtHome;
+    double verticalDesired;
+    double horizontalDesired;
+    double stackDegreesDesired;
+    double wristPositionDesired = wristConversionToServo(90);
 
 
     /*******
@@ -126,7 +137,7 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
     @Override
 
     //This is the opMode call for generically running the opMode in this super class
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
 
 
         String controlPadMap = "SkyStone Hunchamuncha Left Strafe";
@@ -137,21 +148,20 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
     }
 
     //This is the method that handles the controls
-    public void controlRobot(String controlPadMap, Boolean supportArm, Double defaultDrivePower){
+    public void controlRobot(String controlPadMap, Boolean supportArm, Double defaultDrivePower) throws InterruptedException {
 
         boolean accountForArmDrift = supportArm;
 
         /***********************
          * Modifiable variables
          **********************/
-        endGameStart = 90;
-        endGameWarning = endGameStart + 15;
-        endGameOver = endGameStart + 30;
-        greenWarningTime = 60;
-        yellowWarningTime = 70;
-        redWarningTime = 80;
-        defaultArmPower = 0.75;
-        double wristPositionDesired = 0.5;
+        //mtzConstants.endGameStart = 90;
+        //endGameWarning = endGameStart + 15;
+        //endGameOver = endGameStart + 30;
+        //greenWarningTime = 60;
+        //yellowWarningTime = 70;
+        //redWarningTime = 80;
+        //defaultArmPower = 0.75;
 
         /***************
          * Set Timer Variables
@@ -187,29 +197,25 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        arm.setDirection(DcMotor.Direction.REVERSE);
         armExtension.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
+        //arm.setDirection(DcMotor.Direction.REVERSE);
+
         /**********************************
-         * Set positions on initialize
+         * Do Not set positions on initialize
          **********************************/
 
-        /*claw.setPosition(1);
-        leftHook.setPosition(0.5);
-        rightHook.setPosition(0.5);
-        blockThrower.setPosition(1);
-        wrist.setPosition(.5);*/
 
         /***********************************************
          * Tell driver station that initialization complete
          **********************************************/
         telemetry.log().add("Initialized. Go MTZ! Timer Set for ");
 
-        telemetry.log().add(Double.toString(greenWarningTime)+" s, " +
-                Double.toString(yellowWarningTime)+" s, " +
-                Double.toString(redWarningTime)+" s, " +
-                Double.toString(endGameStart)+" s, "
+        telemetry.log().add(greenWarningTime+" s, " +
+                yellowWarningTime+" s, " +
+                redWarningTime+" s, " +
+                endGameStart+" s, "
         );
 
         /************* Press Play Button ***********************/
@@ -470,10 +476,14 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
                 clawClose = gamepad2.right_stick_y;             //Claw
 
 /*************           End     SkyStone Left Strafe     Updates            **************/
+            }else {
+                /************************************
+                 * Control Pad Map Selection Error
+                 ***********************************/
+                telemetry.log().add("Error in Control Map Selection"); telemetry.update();
+                pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED; blinkinLedDriver.setPattern(pattern);
+                waitForStart(); sleep(30000);
             }
-
-
-
 
             displayTelemetry();
 
@@ -481,9 +491,9 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
              * Speed adjust with triggers
              ********************/
             if (chassisSpeedFast > 0) {
-                drivePower = defaultDrivePower*2;
+                drivePower = defaultDrivePower * driveFastRatio;
             } else if (chassisSpeedSlow > 0) {
-                drivePower = defaultDrivePower * 0.7;
+                drivePower = defaultDrivePower * driveSlowRatio;
                 } else {
                     drivePower = defaultDrivePower;
             }
@@ -492,16 +502,8 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
              * Hook Controls
              ****************/
 
-            if (hooksDownButtonStatus.isDown) {
-                leftHook.setPosition(0);
-                rightHook.setPosition(0);
-                //drivePower = defaultDrivePower/2;
-                drivePower = .1;
-            }
-            if (hooksUpButtonStatus.isDown) {
-                leftHook.setPosition(0.5);
-                rightHook.setPosition(0.5);
-            }
+            if (hooksDownButtonStatus.isDown) { HooksDown(); }
+            if (hooksUpButtonStatus.isDown) { HooksUp(); }
 
             /*************************
              * Chassis drive controls
@@ -513,67 +515,123 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
             frontRight.setPower(drivePower * ((-driveStick1 - strafeStick) - turnStick));
 
 
-
+            /*************************
+             * Chassis bump controls
+             *************************/
+            if(chassisBumpForwardStatus.clickedDown){ Drive(driveBump,.5,0); }
+            if(chassisBumpBackStatus.clickedDown){ Drive(driveBump,.5,0); }
+            if(chassisBumpLeftStrafeStatus.clickedDown){ Strafe(strafeBump,.5,0); }
+            if(chassisBumpRightStrafeStatus.clickedDown){ Strafe(-strafeBump,.5,0); }
+            if(chassisBumpLeftTurnStatus.clickedDown){ Turn(-turnBump,.5,0); }
+            if(chassisBumpRightTurnStatus.clickedDown){ Turn(turnBump,.5,0); }
 
             /*************
              * Arm Controls
              *************/
-            /*
-
-            if (gamepad2.right_trigger > 0) {
-
-                armPower = 0.5;
-            } else if (gamepad2.left_trigger > 0) {
-                armPower = 0.2;
-            } else {
-                armPower = 0.35;
-            }
-             */
-
-            armPower = defaultArmPower;
-
 
             if (accountForArmDrift) {
-
-                arm.setPower( armPower * (handVerticalStick) - 0.2 );
+                arm.setPower( -1 * (defaultArmPower * (handVerticalStick) - 0.2) );
             } else {
 
                if(handVerticalStick < 0) {
-                   arm.setPower(armPower * (handVerticalStick));
+                   arm.setPower(defaultArmPower * (-handVerticalStick));
                } else {
-                   arm.setPower(0.75 * armPower * (handVerticalStick));
+                   arm.setPower(0.75 * defaultArmPower * (-handVerticalStick));
                }
             }
 
             armExtension.setPower((handHorizontalStick));
 
+            if (handVerticalStick!=0){
+                stackLevel = -1;
+            }
+            if (handHorizontalStick!=0){
+                stackDistance = -1;
+            }
             /*************
              * Claw Controls
              *************/
 
-            claw.setPosition(1-clawClose);
-
-            /*************
-             * Wrist Controls
-             *************/
-
-            if (wristAdjustLessStatus.clickedDown) {
-                wristPositionDesired = wristPositionDesired - 0.01;
-            } else if (wristAdjustMoreStatus.clickedDown) {
-                wristPositionDesired = wristPositionDesired + 0.01;
+            if(clawClose>0.9){clawRemainClosed = true; }
+            if(clawOpen>0.9){clawRemainClosed = false;}
+            if(clawRemainClosed){
+                claw.setPosition(clawClosedPosition);
+            } else {
+                    claw.setPosition(clawOpenPosition-clawClose-clawOpen);
             }
 
-            wrist.setPosition(wristPositionDesired);
 
             /************************
              * Cap Stone thrower controls
              ***********************/
 
             if(blockThrowerButtonStatus.isDown){
-                blockThrower.setPosition(0.55);
+                blockThrower.setPosition(blockThrowerDownPosition);
             } else {
-                blockThrower.setPosition(1);
+                blockThrower.setPosition(blockThrowerUpPosition);
             }
+
+
+            /************************
+             * Stacker Controls
+             ***********************/
+            armRotationDegrees = arm.getCurrentPosition()/ticksPerDegreeArm;
+            armExtensionInches = armExtension.getCurrentPosition()/ticksPerInchExtension;
+
+
+            if(stackLevelUpStatus.clickedDown){
+                stackingDown=false;
+                if(stackLevel!=-1 && stackLevel < stackHeightOnLevelArray.length-1){
+                    stackLevel++;
+                }
+                goToStackPosition(stackingDown,stackLevel,stackDistance,aboveLevel);
+            }
+            if(stackHalfLevelDownStatus.clickedDown){
+                stackingDown=true;
+                if(stackLevel!=-1){
+                    if(aboveLevel){
+                        aboveLevel = false;
+                    } else if(stackLevel!=0){
+                        stackLevel--;
+                        aboveLevel = true;
+                    }
+                }
+                goToStackPosition(stackingDown,stackLevel,stackDistance,aboveLevel);
+            }
+            if(stackDistanceMoreStatus.clickedDown){
+                stackingDown = false;
+                if(stackDistance!=-1 && stackDistance < stackHeightOnLevelArray.length-1){
+                    stackDistance++;
+                }
+                goToStackPosition(stackingDown,stackLevel,stackDistance,aboveLevel);
+            }
+            if(stackDistanceLessStatus.clickedDown){
+                stackingDown = false;
+                if(stackDistance>0 && stackDistance < stackHeightOnLevelArray.length-1){
+                    stackDistance--;
+                }
+                goToStackPosition(stackingDown,stackLevel,stackDistance,aboveLevel);
+            }
+
+            /*************
+             * Wrist Controls
+             *************/
+
+            if (wristAdjustLessStatus.clickedDown) {
+                wristPositionDesired = wristPositionDesired - wristBump;
+            } else if (wristAdjustMoreStatus.clickedDown) {
+                wristPositionDesired = wristPositionDesired + wristBump;
+            }
+
+            if(wristPositionDesired < minWristPosition){
+                wristPositionDesired = minWristPosition;
+            }
+
+            if(wristPositionDesired > maxWristPosition){
+                wristPositionDesired = maxWristPosition;
+            }
+
+            wrist.setPosition(wristPositionDesired);
 
             /*********************************
              * Check if timer has elapsed
@@ -582,6 +640,10 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
             if (endGameTimer.seconds()>endGameOver){
                 endGameStartElapsed = true;
                 pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE;
+                blinkinLedDriver.setPattern(pattern);
+            } else if (endGameTimer.seconds()>endGameWarning2){
+                endGameStartElapsed = true;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.STROBE_RED;
                 blinkinLedDriver.setPattern(pattern);
             } else if (endGameTimer.seconds()>endGameWarning){
                 endGameStartElapsed = true;
@@ -607,6 +669,251 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
         }
     }
 
+    //Motion Methods
+
+    public void Drive(double distance, double motorPower, int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            StopAndResetDriveEncoders();
+            DriveByInches(distance);
+            RunDriveToPosition();
+            DrivePower(motorPower);
+            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                DisplayDriveTelemetry();
+            }
+            DrivePower(0);
+            Thread.sleep(pause);
+        }
+    }
+    public void Strafe(double leftDistance, double power, int pause) throws InterruptedException {
+        //Left is positive
+        if (opModeIsActive()) {
+            StopAndResetDriveEncoders();
+            StrafeByInches(leftDistance);
+            RunDriveToPosition();
+            DrivePower(power);
+            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                DisplayDriveTelemetry();
+            }
+            DrivePower(0);
+            Thread.sleep(pause);
+        }
+    }
+    public void Turn(double rightDegrees, double power, int pause) throws InterruptedException {
+        //Left is negative
+        if (opModeIsActive()) {
+            StopAndResetDriveEncoders();
+            TurnByAngle(rightDegrees);
+            RunDriveToPosition();
+            DrivePower(power);
+            while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
+                DisplayDriveTelemetry();
+            }
+            DrivePower(0);
+            Thread.sleep(pause);
+        }
+    }
+    public void goToStackPosition(boolean stackingDown,int stackLevel,int stackDistance,boolean aboveLevel) throws InterruptedException {
+        double vertDesired, horDesired, degreesDesired, vertRequired,armSpeed;
+        if (stackLevel<0){
+            stackLevel = findStackLevel();
+            if(stackingDown){
+                aboveLevel = true;
+            }
+        }
+        if (stackDistance<0){
+            stackDistance = findStackDistance();
+        }
+        if (stackLevel >= 0 && stackDistance >= 0) {
+            // Check if the stone is getting set down on a level and go slow if so
+            if (aboveLevel) {
+                vertDesired = stackHeightAboveLevelArray[stackLevel];
+                armSpeed = defaultArmLowerPower;
+            } else {
+                vertDesired = stackHeightOnLevelArray[stackLevel];
+                armSpeed = defaultArmLowerPower / 3;
+            }
+            if (!stackingDown) {
+                armSpeed = defaultArmPower;
+            }
+
+            vertRequired = vertDesired - armPivotHeight;
+            horDesired = stackDistanceArray[stackDistance];
+            
+            degreesDesired = Math.toDegrees(Math.asin((vertRequired) / (armLengthDesired(horDesired, vertDesired))));
+
+            //Stay in the max & min
+            armExtensionInches = armLengthDesired(horDesired, vertDesired) - armExtensionCollapsedLength;
+            if(armExtensionInches < minArmExtensionInches){
+                armExtensionInches = minArmExtensionInches;
+            } else if(armExtensionInches > maxArmExtensionInches){
+                armExtensionInches = maxArmExtensionInches;
+            }
+            if(degreesDesired < minArmDegrees){
+                degreesDesired = minArmDegrees;
+            } else if(degreesDesired > maxArmDegrees){
+                degreesDesired = maxArmDegrees;
+            }
+            stackDegreesDesired = degreesDesired;
+            // Set the target positions to run to
+            armExtension.setTargetPosition((int) (armExtensionInches * ticksPerInchExtension));
+            raiseByDegrees(degreesDesired);
+            wristPositionDesired = wristAutoLevel(degreesDesired);
+            horizontalDesired = horDesired;
+            verticalDesired = vertDesired;
+
+            if (opModeIsActive()) {
+                // Turn motors on to let them reach the target if the stop button hasn't been pressed
+                arm.setPower(armSpeed);
+                armExtension.setPower(defaultArmExtensionPower);
+                //wrist.setPosition(wristPositionDesired);
+            }
+
+            arm.setPower(0);
+            armExtension.setPower(0);
+            Thread.sleep(defaultPauseTime);
+        }
+
+    }
+    public double armLengthDesired(double horDesired, double vertDesired){
+        double horArmLengthDesired = horDesired + armPivotDistance;
+        double vertArmLengthDesired = vertDesired-armPivotHeight;
+        return Math.sqrt(Math.pow(horArmLengthDesired,2) + Math.pow(vertArmLengthDesired,2));
+    }
+
+    public void RaiseArm(double degrees, double power,int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            raiseByDegrees(degrees);
+            ArmPower(power);
+        }
+        ArmPower(0);
+        Thread.sleep(pause);
+
+    }
+    public void LowerArm(double degrees, double power, int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            raiseByDegrees(-degrees);
+            ArmPower(power);
+        }
+        ArmPower(0);
+        Thread.sleep(pause);
+
+    }
+    public double wristAutoLevel(double armAngle){
+                return wristConversionToServo(armAngle + 90);
+    }
+
+    public void ExtendArm(double desiredArmLength, double power,int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            armExtensionInches = desiredArmLength - armExtensionCollapsedLength;
+            if(armExtensionInches<minArmExtensionInches){
+                armExtensionInches=minArmExtensionInches;
+            } else if(armExtensionInches>maxArmExtensionInches){
+                armExtensionInches=maxArmExtensionInches;
+            }
+            armExtension.setTargetPosition((int) (armExtensionInches * ticksPerInchExtension));
+            armExtension.setPower(power);
+        }
+        armExtension.setPower(0);
+        Thread.sleep(pause);
+    }
+    public void HooksDown()throws InterruptedException {
+        //Light Reverse Power On
+        lightReverse();
+
+        leftHook.setPosition(0);
+        rightHook.setPosition(0);
+        sleep(1500);
+
+        //Reverse Power Off
+        StopAndResetDriveEncoders();
+    }
+    public void HooksUp() {
+        leftHook.setPosition(0.5);
+        rightHook.setPosition(0.5);
+        sleep(1500);
+    }
+    public void lightReverse() throws InterruptedException{
+        Drive(-1,0.1,50);
+    }
+
+
+//Encoder Methods
+
+    public void StopAndResetAllEncoders() {
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void StopAndResetDriveEncoders() {
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void StopAndResetArmEncoder() {
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    public void RunDriveToPosition() {
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    public void RunArmToPosition() {
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    public void RunArm() {
+        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    //End of Encoder Methods
+
+//Distance Calculation Methods
+
+    public void DriveByInches(double distance) {
+        frontLeft.setTargetPosition((int)(distance * ticksPerInchWheelDrive));
+        frontRight.setTargetPosition((int)(distance * ticksPerInchWheelDrive));
+        backLeft.setTargetPosition((int)(-1 * distance * ticksPerInchWheelDrive));
+        backRight.setTargetPosition((int)(-1 * distance * ticksPerInchWheelDrive));
+    }
+
+    public void StrafeByInches(double distance) {
+        frontLeft.setTargetPosition((int)(distance * ticksPerInchWheelStrafe));
+        frontRight.setTargetPosition((int)(-distance * ticksPerInchWheelStrafe));
+        backLeft.setTargetPosition((int)(distance * ticksPerInchWheelStrafe));
+        backRight.setTargetPosition((int)(-distance * ticksPerInchWheelStrafe));
+    }
+
+    public void TurnByAngle(double degrees) {
+        frontLeft.setTargetPosition((int)(degrees * ticksPerDegreeTurnChassis));
+        frontRight.setTargetPosition((int)(-degrees * ticksPerDegreeTurnChassis));
+        backLeft.setTargetPosition((int)(-degrees * ticksPerDegreeTurnChassis));
+        backRight.setTargetPosition((int)(degrees * ticksPerDegreeTurnChassis));
+    }
+
+    public void raiseByDegrees(double degrees) {
+        arm.setTargetPosition((int)(degrees * ticksPerDegreeArm));
+    }
+
+    //End of distance calculation methods
+
+//Power Methods
+
+    public void DrivePower(double power) {
+        frontLeft.setPower(power);
+        frontRight.setPower(power);
+        backLeft.setPower(power);
+        backRight.setPower(power);
+    }
+    public void ArmPower(double power) {
+        arm.setPower(power);
+    }
+//End Power Methods
+
+
+//Telemetry Methods
     public void displayTelemetry() {
         telemetry.clearAll();
         telemetry.addLine()
@@ -620,9 +927,25 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
         telemetry.addLine()
                 .addData("Back Right Power: ", backRight.getPower());
         telemetry.addLine()
-                .addData("Arm Power: ", arm.getPower());
+                .addData("Stack Level: ", stackLevel);
         telemetry.addLine()
-                .addData("Arm Extender Power: ", armExtension.getPower());
+                .addData("Stack Distance: ", stackDistance);
+        telemetry.addLine()
+                .addData("Vert Desired: ", verticalDesired);
+        telemetry.addLine()
+                .addData("Hor Desired: ", horizontalDesired);
+        telemetry.addLine()
+                .addData("Arm Ticks: ", arm.getCurrentPosition());
+        telemetry.addLine()
+                .addData("Arm Current Degrees: ", arm.getCurrentPosition()/ticksPerDegreeArm);
+        telemetry.addLine()
+                .addData("Arm Theoretical Degrees: ", armRotationDegrees);
+        telemetry.addLine()
+                .addData("Stack Degrees Desired: ", stackDegreesDesired);
+        telemetry.addLine()
+                .addData("Arm Extension: ", armExtension.getCurrentPosition());
+        telemetry.addLine()
+                .addData("Arm Length: ", armExtensionInches + armExtensionCollapsedLength);
         telemetry.addLine()
                 .addData("Claw Position: ", claw.getPosition());
         telemetry.addLine()
@@ -633,6 +956,35 @@ public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
                 .addData("Right Hook Position: ", rightHook.getPosition());
         telemetry.addLine()
                 .addData("Block Thrower Position: ", blockThrower.getPosition());
+        telemetry.addLine()
+                .addData("ticksPerDegreesArm: ", ticksPerDegreeArm);
+        telemetry.addLine()
+                .addData("ticksPerInchExtension: ", ticksPerInchExtension);
         telemetry.update();
     }
+    public void DisplayDriveTelemetry() {
+        double frontLeftInches = frontLeft.getCurrentPosition() / ticksPerInchWheelDrive;
+        double frontRightInches = frontRight.getCurrentPosition() / ticksPerInchWheelDrive;
+        double backLeftInches = backLeft.getCurrentPosition() / ticksPerInchWheelDrive;
+        double backRightInches = backRight.getCurrentPosition() / ticksPerInchWheelDrive;
+        telemetry.clear();
+        telemetry.addLine()
+                .addData("Front Left Inches ", (int) frontLeftInches + "   Power: " + "%.1f", frontLeft.getPower());
+        telemetry.addLine()
+                .addData("Front Right Inches: ", (int) frontRightInches + "   Power: " + "%.1f", frontRight.getPower());
+        telemetry.addLine()
+                .addData("Back Left Inches: ", (int) backLeftInches + "   Power: " + "%.1f", backLeft.getPower());
+        telemetry.addLine()
+                .addData("Back Right Inches: ", (int) backRightInches + "   Power: " + "%.1f", backRight.getPower());
+        telemetry.update();
+    }
+    public void DisplayArmTelemetry() {
+        double armDegrees = arm.getCurrentPosition() / ticksPerDegreeArm;
+        telemetry.clear();
+        telemetry.addLine()
+                .addData("Arm Degrees ", (int) armDegrees + "  Power: " + "%.1f", arm.getPower());
+        telemetry.update();
+    }
+    //End of Telemetry Methods
+    //End of Class
 }

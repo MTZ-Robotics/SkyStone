@@ -197,7 +197,7 @@ public class z_test_TeleControlsMTZ23 extends LinearOpMode {
         //DrivePower(-0.1);
 
         //Substituting this instead
-        //Drive(-1,0.1,defaultPauseTime);*/
+        Drive(-1,0.1,defaultPauseTime);
     }
 
     //Telemetry Methods
@@ -250,25 +250,25 @@ public class z_test_TeleControlsMTZ23 extends LinearOpMode {
 
 //Distance Calculation Methods
 
-    public void DriveByInches(int distance) {
-        frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        frontRight.setTargetPosition(distance * (int) conversionTicksToInches);
-        backLeft.setTargetPosition(-1 * distance * (int) conversionTicksToInches);
-        backRight.setTargetPosition(-1 * distance * (int) conversionTicksToInches);
+    public void DriveByInches(double distance) {
+        frontLeft.setTargetPosition((int)(distance * conversionTicksToInches));
+        frontRight.setTargetPosition((int)(distance * conversionTicksToInches));
+        backLeft.setTargetPosition(-1 * (int)(distance * conversionTicksToInches));
+        backRight.setTargetPosition(-1 * (int)(distance * conversionTicksToInches));
     }
 
-    public void StrafeByInches(int distance) {
-        frontLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        frontRight.setTargetPosition(-distance * (int) conversionTicksToInches);
-        backLeft.setTargetPosition(distance * (int) conversionTicksToInches);
-        backRight.setTargetPosition(-distance * (int) conversionTicksToInches);
+    public void StrafeByInches(double distance) {
+        frontLeft.setTargetPosition((int)(distance * conversionTicksToInches));
+        frontRight.setTargetPosition(-1 * (int)(distance * conversionTicksToInches));
+        backLeft.setTargetPosition((int)(distance * conversionTicksToInches));
+        backRight.setTargetPosition(-1 * (int)(distance * conversionTicksToInches));
     }
 
-    public void TurnByAngle(int degrees) {
-        frontLeft.setTargetPosition(degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
-        frontRight.setTargetPosition(-degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
-        backLeft.setTargetPosition(-degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
-        backRight.setTargetPosition(degrees * (int) conversionTicksToInches * (int) experimentalInchesPerTurn / 360);
+    public void TurnByAngle(double degrees) {
+        frontLeft.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        frontRight.setTargetPosition(-1 * (int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        backLeft.setTargetPosition(-1* (int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        backRight.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
     }
 
 //Power Methods
@@ -285,9 +285,9 @@ public class z_test_TeleControlsMTZ23 extends LinearOpMode {
     public void RunArmToPosition() {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-    public void RaiseByInches(int distance) {
-        arm.setTargetPosition(distance * 45);
-    }
+    public void RaiseByInches(double distance) {
+        arm.setTargetPosition((int) (distance * 45));
+    } //
     public void ArmPower(double power) {
         arm.setPower(power);
     }

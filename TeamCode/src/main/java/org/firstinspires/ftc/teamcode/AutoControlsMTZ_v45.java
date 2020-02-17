@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name ="Auto Controls v.45 Spearmint", group = "z_test")
 
+//Adds path selection error handling
+
 //@Disabled
 
 public class AutoControlsMTZ_v45 extends LinearOpMode {

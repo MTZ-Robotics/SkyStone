@@ -7,8 +7,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name ="Auto Controls v.46 Rosemary", group = "z_test")
+import static org.firstinspires.ftc.teamcode.mtzConstants.*;
 
+@Autonomous(name ="Auto Controls v.46 Rosemary", group = "z_test")
+//Adds adjustment variables
+//Adds additional paths for sensed auto
 //@Disabled
 
 public class AutoControlsMTZ_v46 extends LinearOpMode {
@@ -578,25 +581,14 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
             Thread.sleep(pause);
         }
     }
-    public void RaiseArm(int distance, int pause) throws InterruptedException {
+    public void RaiseArmByDegrees(double degrees, int pause) throws InterruptedException {
         if (opModeIsActive()) {
-            RaiseByInches (distance);
-            ArmPower(.75);
-            }
-            ArmPower(0);
-            Thread.sleep(pause);
-
-
-       /* //Use time based arm controls since the arm falls when the target distance is reached
-
-        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.setPower(0.4);
-        //1000 ms = 12 inches
-        sleep(distance * 1000/12);
-        //sleep(1000);
-        arm.setPower(0.2);
+            RaiseByInches (degrees);
+            ArmPower(defaultArmPower);
+        }
+        ArmPower(0);
         Thread.sleep(pause);
-        */
+
     }
 
     public void LowerArm(int distance, int pause) throws InterruptedException {
@@ -606,6 +598,15 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         Thread.sleep(pause);
 
          */
+    }
+    public void RaiseArm(int distance, int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            RaiseByInches (distance);
+            ArmPower(defaultArmPower);
+        }
+        ArmPower(0);
+        Thread.sleep(pause);
+
     }
     public void HooksDown()throws InterruptedException {
         //Light Reverse Power On
@@ -637,24 +638,6 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         Drive(-1,0.1,defaultPauseTime);
     }
 
-    //Telemetry Methods
-
-    public void DisplayDriveTelemetry() {
-        double frontLeftInches = frontLeft.getCurrentPosition() / conversionTicksToInches;
-        double frontRightInches = frontRight.getCurrentPosition() / conversionTicksToInches;
-        double backLeftInches = backLeft.getCurrentPosition() / conversionTicksToInches;
-        double backRightInches = backRight.getCurrentPosition() / conversionTicksToInches;
-        telemetry.clear();
-        telemetry.addLine()
-                .addData("Front Left Inches ", (int) frontLeftInches + "   Power: " + "%.1f", frontLeft.getPower());
-        telemetry.addLine()
-                .addData("Front Right Inches: ", (int) frontRightInches + "   Power: " + "%.1f", frontRight.getPower());
-        telemetry.addLine()
-                .addData("Back Left Inches: ", (int) backLeftInches + "   Power: " + "%.1f", backLeft.getPower());
-        telemetry.addLine()
-                .addData("Back Right Inches: ", (int) backRightInches + "   Power: " + "%.1f", backRight.getPower());
-        telemetry.update();
-    }
     public void DisplayArmTelemetry() {
         double armInches = arm.getCurrentPosition() / conversionTicksToInches;
         telemetry.clear();
@@ -691,6 +674,8 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
+    //End of Encoder Methods
+
 //Distance Calculation Methods
 
     public void DriveByInches(int distance) {
@@ -710,15 +695,22 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     }
 
     public void TurnByAngle(int degrees) {
-        frontLeft.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
-        frontRight.setTargetPosition((int)(-degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
-        backLeft.setTargetPosition((int)(-degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
-        backRight.setTargetPosition((int)(degrees * conversionTicksToInches * experimentalInchesPerTurn / 360));
+        frontLeft.setTargetPosition((int)(degrees * ticksPerDegreeTurnChassis));
+        frontRight.setTargetPosition((int)(-degrees * ticksPerDegreeTurnChassis));
+        backLeft.setTargetPosition((int)(-degrees * ticksPerDegreeTurnChassis));
+        backRight.setTargetPosition((int)(degrees * ticksPerDegreeTurnChassis));
     }
-    public void RaiseByInches(int distance) {
-        int correctedDistance = (int)(distance*(armDistanceAdjustment));
+    public void RaiseByInches(double distance) {
+        int correctedDistance = (int) (distance * (armDistanceAdjustment));
         arm.setTargetPosition(correctedDistance);
     }
+
+    public void raiseByDegrees(double degrees) {
+        int correctedDistance = (int)(degrees * ticksPerDegreeArm);
+        arm.setTargetPosition(correctedDistance);
+    }
+
+    //End of distance calculation methods
 
 //Power Methods
 
@@ -731,5 +723,26 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     public void ArmPower(double power) {
         arm.setPower(power);
     }
+//End Power Methods
 
+    //Telemetry Methods
+
+    public void DisplayDriveTelemetry() {
+        double frontLeftInches = frontLeft.getCurrentPosition() / conversionTicksToInches;
+        double frontRightInches = frontRight.getCurrentPosition() / conversionTicksToInches;
+        double backLeftInches = backLeft.getCurrentPosition() / conversionTicksToInches;
+        double backRightInches = backRight.getCurrentPosition() / conversionTicksToInches;
+        telemetry.clear();
+        telemetry.addLine()
+                .addData("Front Left Inches ", (int) frontLeftInches + "   Power: " + "%.1f", frontLeft.getPower());
+        telemetry.addLine()
+                .addData("Front Right Inches: ", (int) frontRightInches + "   Power: " + "%.1f", frontRight.getPower());
+        telemetry.addLine()
+                .addData("Back Left Inches: ", (int) backLeftInches + "   Power: " + "%.1f", backLeft.getPower());
+        telemetry.addLine()
+                .addData("Back Right Inches: ", (int) backRightInches + "   Power: " + "%.1f", backRight.getPower());
+        telemetry.update();
+    }
+    //End of Telemetry Methods
+    //End of Class
 }

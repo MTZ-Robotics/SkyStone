@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name="Left Strafe New Arm", group ="A_Top")
+@TeleOp(name="Hunchamuncha Left Strafe", group ="A_Top")
 
 //@Disabled
 
