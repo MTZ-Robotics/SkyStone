@@ -13,11 +13,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class TeleMTZ_Drive_Controls_KV extends LinearOpMode {
 
-    /********************************
+    /*****************
      * Timer Variables
-     ********************************/
+     *****************/
     private ElapsedTime endGameTimer;
-
     double greenWarningTime;
     double yellowWarningTime;
     double redWarningTime;
@@ -29,13 +28,16 @@ public class TeleMTZ_Drive_Controls_KV extends LinearOpMode {
     boolean redTimerElapsed;
     boolean endGameStartElapsed;
 
-    /***********
-     * Lights Control Declarations
-     ***********/
+    /*************************
+     * Arm Extension Variables
+     *************************/
+    //double
 
+    /*****************************
+     * Lights Control Declarations
+     ********************8********/
     RevBlinkinLedDriver blinkinLedDriver;
     RevBlinkinLedDriver.BlinkinPattern pattern;
-
 
     /*************************
      * Motor & Servo Variables
@@ -230,7 +232,11 @@ public class TeleMTZ_Drive_Controls_KV extends LinearOpMode {
                 arm.setPower( armPower * (gamepad2.left_stick_y) );
             }
 
-            armExtension.setPower((gamepad2.left_stick_x));
+            if (gamepad2.left_stick_x != 0) {
+                armExtension.setPower((gamepad2.left_stick_x));
+            } else if (gamepad2.left_stick_y != 0) {
+                armExtension.setPower((gamepad2.left_stick_x));
+            }
 
             /*************
              * Claw Controls
