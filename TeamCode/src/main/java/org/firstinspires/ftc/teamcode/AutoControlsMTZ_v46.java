@@ -69,7 +69,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
-        autoPaths("Red","DepotSampleWall",false);
+        autoPaths("Red","FoundationWall",false);
 
     }
 
@@ -256,6 +256,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
              * This code has not yet been tested
              ***********************************/
             Drive(10, defaultDriveSpeed, defaultPauseTime);
+            Drive(2,0.05,1000);
             sampleSkyStone(allianceReverser);
             grabSkyStone(allianceReverser);
             //Reverse
@@ -431,9 +432,9 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     public void goToFoundationfromWall(int allianceReverser) throws InterruptedException{
 
         //Align Hooks With Foundation
-        Drive(-24, defaultDriveSpeed, defaultPauseTime);
-        Strafe(allianceReverser*12, defaultDriveSpeed, defaultPauseTime);
-        Drive(-5, defaultDriveSpeed, defaultPauseTime);
+        Drive(24, defaultDriveSpeed, defaultPauseTime);
+        Strafe(allianceReverser * -12, defaultDriveSpeed, defaultPauseTime);
+        Drive(5, defaultDriveSpeed, defaultPauseTime);
     }
 
     public void moveFoundation (int allianceReverser) throws InterruptedException{
@@ -442,16 +443,17 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         HooksDown();
 
         //Move Foundation to Build Zone
-        Drive(20, 0.2, defaultPauseTime);
-        Turn(allianceReverser * -40, 0.2, defaultPauseTime);
-        Drive(5, 0.2, defaultPauseTime);
-        Turn(allianceReverser * -80, 0.2, defaultPauseTime);
-        Strafe(allianceReverser * -5, 0.2, defaultPauseTime);
-        Drive(-12, 0.1, defaultPauseTime);
+        Drive(-20, 0.2, defaultPauseTime);
+        Turn(allianceReverser * 40, 0.2, defaultPauseTime);
+        Drive(5, -0.2, defaultPauseTime);
+        Turn(allianceReverser * 80, 0.2, defaultPauseTime);
+        Strafe(allianceReverser * 5, 0.2, defaultPauseTime);
+        Drive(12, 0.1, defaultPauseTime);
 
         //Unhook Foundation
         HooksUp();
     }
+
     public void foundationToAudienceDepot(int allianceReverser) throws InterruptedException {
         /***
         * Travel to Audience
