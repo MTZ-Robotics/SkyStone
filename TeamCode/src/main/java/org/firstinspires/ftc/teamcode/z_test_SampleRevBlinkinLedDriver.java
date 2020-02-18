@@ -56,7 +56,7 @@ public class z_test_SampleRevBlinkinLedDriver extends OpMode {
     /*
      * Change the pattern every 10 seconds in AUTO mode.
      */
-    private final static int LED_PERIOD = 10;
+    private final static int LED_PERIOD = 5;
 
     /*
      * Rate limit gamepad button presses to every 500ms.

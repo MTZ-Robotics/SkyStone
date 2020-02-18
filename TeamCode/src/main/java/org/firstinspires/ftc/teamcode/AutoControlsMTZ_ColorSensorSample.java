@@ -83,8 +83,13 @@ public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
+
         leftColorSensor = hardwareMap.colorSensor.get("color_sensor");
         //rightColorSensor = hardwareMap.colorSensor.get("color_sensor2");
+
+        leftColorSensor = hardwareMap.colorSensor.get("sensor_color");
+        //rightColorSensor = hardwareMap.colorSensor.get("sensor_color2");
+
 
         /********************************
          * Set Motor and Servo Directions
