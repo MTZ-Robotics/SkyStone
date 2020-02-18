@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -52,6 +55,8 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
+    private ColorSensor leftColorSensor;
+    private ColorSensor rightColorSensor;
 
 
     /***********
@@ -86,6 +91,8 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
+        leftColorSensor = hardwareMap.get(ColorSensor.class, "sensor_color");;
+        //rightColorSensor = hardwareMap.colorSensor.get("sensor_color2");
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
@@ -244,43 +251,44 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
             /************
              * Path Start
              ************/
+//Move forward slightly
+            /***********************************
+             * This code has not yet been tested
+             ***********************************/
+            Drive(10, defaultDriveSpeed, defaultPauseTime);
+            sampleSkyStone(allianceReverser);
+            grabSkyStone(allianceReverser);
+            //Reverse
+            Drive(-12,defaultDriveSpeed,defaultPauseTime);
 
-            if (pathToRun=="DepotSampleWall") {
-                //Move forward slightly
-                /***********************************
-                 * This code has not yet been tested
-                 ***********************************/
-                Drive(10, defaultDriveSpeed, defaultPauseTime);
-                grabSkyStone(allianceReverser);
+            //Strafe right towards first block in line
+            //Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
 
-                //Strafe right towards first block in line
-                //Strafe(allianceReverser * -8,defaultDriveSpeed,defaultPauseTime);
+            //Move toward first block in line
+            //Drive(20, defaultDriveSpeed, defaultPauseTime);
 
-                //Move toward first block in line
-                //Drive(20, defaultDriveSpeed, defaultPauseTime);
+            //Lower arm
+            //LowerArm(7 ,defaultPauseTime);
 
-                //Lower arm
-                //LowerArm(7 ,defaultPauseTime);
+            //Close claw to grab block
+            //claw.setPosition(1);
 
-                //Close claw to grab block
-                //claw.setPosition(1);
+            //Raise arm slightly
+            //RaiseArm(2,defaultPauseTime);
 
-                //Raise arm slightly
-                //RaiseArm(2,defaultPauseTime);
+            //Reverse
+            //Drive(-24,defaultDriveSpeed,defaultPauseTime);
 
-                //Reverse
-                //Drive(-24,defaultDriveSpeed,defaultPauseTime);
+            //Turn towards line
+            //Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
 
-                //Turn towards line
-                Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
+            //Drive past line with block
+            Strafe(-3*24,defaultDriveSpeed,defaultPauseTime);
 
-                //Drive past line with block
-                Drive(3*24,defaultDriveSpeed,defaultPauseTime);
-                
-                Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
-                //Reverse
-                Drive(-12,defaultDriveSpeed,defaultPauseTime);
-                moveFoundation(allianceReverser);
+            //Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
+            //Forward
+            Drive(12,defaultDriveSpeed,defaultPauseTime);
+            moveFoundation(allianceReverser);
 
             //Align to Park
             if (pathToRun=="DepotSampleBridge") {
@@ -300,9 +308,7 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
 
             //Park
             Drive(14, defaultDriveSpeed/2, 0);
-                
-                
-            }
+
 
         } else if (pathToRun=="FoundationSampleWall") {
 
@@ -466,56 +472,6 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         Strafe(allianceReverser * 8, defaultDriveSpeed/2, defaultPauseTime);
 
     }
-    public void grabSkyStone(int allianceReverser) throws InterruptedException {
-        //Determine which of the 3 positions to go after
-        //position 1 = audience side
-        //position 2 = middle
-        //position 3 = bridge side
-        // if blue alliance and location = right, then position 1
-        //if Red alliance and location = right, then position 3
-
-        int skyStonePosition = 2;
-        int skyStoneLocation = determineSkyStone();
-
-        if (skyStoneLocation == 1) {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
-            blinkinLedDriver.setPattern(pattern);
-            if (allianceReverser == 1) { skyStonePosition = 3;
-            } else {                  skyStonePosition = 1;
-            }
-
-        } else if (skyStoneLocation == 2) {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-            blinkinLedDriver.setPattern(pattern);
-            skyStonePosition = 2;
-
-        } else if (skyStoneLocation == 3) {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-            blinkinLedDriver.setPattern(pattern);
-            if (allianceReverser == 1) { skyStonePosition = 1;
-            } else {                  skyStonePosition = 3;
-            }
-        }
-        //Angle towards skystone
-        if (skyStonePosition==1) {
-            Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
-        } else if (skyStonePosition==3) {
-            Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
-        }
-        Drive(21,defaultDriveSpeed/2,defaultPauseTime);
-        RaiseArm(-2,defaultPauseTime);
-        //CloseClaw();
-        claw.setPosition(1);
-        sleep(1000);
-        RaiseArm(4,defaultPauseTime);
-        Drive(-21,defaultDriveSpeed/2,defaultPauseTime);
-       //reorient back to facing quarry
-        if (skyStonePosition==1) {
-            Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
-        } else if (skyStonePosition==3) {
-            Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
-        }
-    }
 
     public void quarryToMovedFoundation (int allianceReverser) throws InterruptedException{
         /*********
@@ -530,13 +486,86 @@ public class AutoControlsMTZ_v46 extends LinearOpMode {
         Turn(allianceReverser*20,defaultTurnSpeed,defaultPauseTime);
         Drive(24, defaultDriveSpeed*2, defaultPauseTime);
     }
+
+    public void grabSkyStone(int allianceReverser) throws InterruptedException {//Angle towards skystone
+        if (skyStonePosition==1) {
+            Strafe(allianceReverser * -8,defaultDriveSpeed / 2,defaultPauseTime);
+            //Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
+        } else if (skyStonePosition==3) {
+            Strafe(allianceReverser * 8,defaultDriveSpeed / 2,defaultPauseTime);
+            //Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
+        }
+        //Drive(21,defaultDriveSpeed/2,defaultPauseTime);
+        RaiseArm(-2,defaultPauseTime);
+        //CloseClaw();
+        claw.setPosition(clawClosedPosition);
+        sleep(1000);
+        RaiseArm(4,defaultPauseTime);
+        Drive(-4,defaultDriveSpeed/2,defaultPauseTime);
+        //reorient back to facing quarry
+        if (skyStonePosition==1) {
+            Strafe(allianceReverser * 8,defaultDriveSpeed / 2,defaultPauseTime);
+            //Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
+        } else if (skyStonePosition==3) {
+            Strafe(allianceReverser * -8,defaultDriveSpeed / 2,defaultPauseTime);
+            //Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
+        }
+    }
+
     //Sampling Methods
 
-    public int determineSkyStone() throws InterruptedException {
+    public void sampleSkyStone (int allianceReverser) throws InterruptedException {
+        //Determine which of the 3 positions to go after
+        //position 1 = audience side
+        //position 2 = middle
+        //position 3 = bridge side
+        // if blue alliance and location = right, then position 1
+        // if Red alliance and location = right, then position 3
+
+        int skyStoneLocation = determineSkyStoneColorSensor();
+
+        if (skyStoneLocation == 1) {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+            blinkinLedDriver.setPattern(pattern);
+            if (allianceReverser == 1) {
+                skyStonePosition = 3;
+            } else {
+                skyStonePosition = 1;
+            }
+
+        } else if (skyStoneLocation == 2) {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
+            blinkinLedDriver.setPattern(pattern);
+            skyStonePosition = 2;
+
+        } else if (skyStoneLocation == 3) {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+            blinkinLedDriver.setPattern(pattern);
+            if (allianceReverser == 1) {
+                skyStonePosition = 1;
+            } else {
+                skyStonePosition = 3;
+            }
+        }
+    }
+    public int determineSkyStoneColorSensor() {
+        float lefthsvValues[] = {0F, 0F, 0F};
+        Color.RGBToHSV(leftColorSensor.red() * 8, leftColorSensor.green() * 8, leftColorSensor.blue() * 8, lefthsvValues);
+        float righthsvValues[] = {0F, 0F, 0F};
+        //Color.RGBToHSV(rightColorSensor.red() * 8, rightColorSensor.green() * 8, rightColorSensor.blue() * 8, righthsvValues);
+
         // Left = 1
         //Center = 2
         //Right = 3
-        return 2;
+        int skyStonePos = 2;
+
+        if(lefthsvValues[0]>60){
+            skyStonePos = 1;
+        } else if(righthsvValues[0]>60){
+            skyStonePos = 3;
+        }
+
+        return skyStonePos;
     }
     //Motion Methods
 

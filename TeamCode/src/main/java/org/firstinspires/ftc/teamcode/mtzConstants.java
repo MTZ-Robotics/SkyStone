@@ -25,10 +25,10 @@ public class mtzConstants {
     public static double defaultArmExtensionPower = 1.0;
 
 
-    public static double driveBump = 0.5; // inches
-    public static double strafeBump = 0.5; // inches
-    public static double turnBump = 1; // degrees
-    public static double wristBump = 0.01; // servo rotations
+    public static double driveBump = 1; // inches
+    public static double strafeBump = 1; // inches
+    public static double turnBump = 3; // degrees
+    public static double wristBump = 0.03; // servo rotations
 
     public static double defaultDriveSpeed = 0.5;
     public static double driveSlowRatio = 0.7;
@@ -44,21 +44,23 @@ public class mtzConstants {
     public static final double rightHookUpPosition = 0.5;
     public static final double leftHookDownPosition = 0;
     public static final double rightHookDownPosition = 0;
-    public static final double leftHookInPosition = 0.75;
-    public static final double rightHookInPosition = 0.75;
+    public static final double leftHookInPosition = 1.0;
+    public static final double rightHookInPosition = 1.0;
     public static final int handAssistRideHeightLevel = 1;
     public static final int handAssistRideHeightDistance = 1;
     public static final boolean handAssistRideHeightAboveLevel = true;
 
+    public static int skyStonePosition = 2;
+
 
 // Adjustments for where home is for the hand
-    public static final double armRotationDegreesAtHome = -45.0;
-    public static final double armExtensionInchesAtHome = 2.0;
+    public static final double armRotationDegreesAtHome = -36.011;
+    public static final double armExtensionInchesAtHome = 3.22;
     public static final int stackDistanceAtHome = 0;
     public static final int stackLevelAtHome = 0;
-    public static final double armExtensionCollapsedLength = 12;
-    public static final double armPivotHeight = 14;
-    public static final double armPivotDistance = 14;
+    public static final double armExtensionCollapsedLength = 16.125;
+    public static final double armPivotHeight = 11.375;
+    public static final double armPivotDistance = 15.65;
 
 // Adjustments for hand position
     public static final double handHorizontalAdjustment = 0;
@@ -69,8 +71,8 @@ public class mtzConstants {
     public static final double maxArmExtensionInches = 200/25.4; //200mm stroke
     public static final double minArmDegrees = -60;
     public static final double maxArmDegrees = 70;
-    public static final double minWristPosition = 0.5;
-    public static final double maxWristPosition = 0.85;
+    public static final double minWristPosition = 0.4;
+    public static final double maxWristPosition = 1.0;
 
 // Stack Arrays
     public static final double[] stackHeightOnLevelArray = {0,1,5,9,13,17,21,25,29,33};
@@ -103,7 +105,7 @@ public class mtzConstants {
 
     public static double wristConversionToServo(double angle){
         double servoPosition = 0.5;
-        double wristAngles[] = {74.00, 90.0, 110};
+        double wristAngles[] = {40.00, 90.0, 140};
         double wristNumbers[] = {minWristPosition, 0.69, maxWristPosition};
         for(int i=0;i <= wristAngles.length - 1;i++ ){
             if(wristAngles[i]>=angle && i==0){

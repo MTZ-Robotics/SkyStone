@@ -276,8 +276,8 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                 chassisBumpBackStatus.update(gamepad1.dpad_down);             //Bump Backwards
 
                 robotExtenderInButtonStatus.update(gamepad1.left_stick_button);             //Park Extender In
-                driveStick1 = gamepad1.left_stick_y;             //Drive 1
-                turnStick = gamepad1.left_stick_x;             //Turn
+                driveStick1 = gamepad1.right_stick_y;             //Drive 1
+                turnStick = gamepad1.right_stick_x;             //Turn
                 chassisSpeedFast = gamepad1.right_trigger;             //High Speed
                 chassisBumpRightTurnStatus.update(gamepad1.right_bumper);             //Bump Right Turn
 
@@ -290,9 +290,9 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                 hooksUpButtonStatus.update(gamepad1.a);             //Hooks Up
 
                 robotExtenderOutButtonStatus.update(gamepad1.left_stick_button);             //Park Extender Out
-                driveStick2 = gamepad1.right_stick_y;             //Drive 2
-                strafeStick = gamepad1.right_stick_x;             //Strafe
-                clawOpen = gamepad2.left_trigger;             //Claw Open (Sticky)
+                driveStick2 = gamepad1.left_stick_y;             //Drive 2
+                strafeStick = gamepad1.left_stick_x;             //Strafe
+                clawOpen = gamepad2.right_trigger;             //Claw Open (Sticky)
                 wristAdjustLessStatus.update(gamepad2.left_bumper);             //Wrist Adjust -
 
                 resetAdjustmentsStatus.update(gamepad2.guide);             //Reset Adjustments
@@ -306,7 +306,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 
                 handVerticalStick = gamepad2.left_stick_y;             //Hand Vertical Move
                 handHorizontalStick = gamepad2.left_stick_x;             //Hand Horizontal Move
-                clawClose = gamepad2.right_trigger;             //Claw Close (Sticky)
+                clawClose = gamepad2.left_trigger;             //Claw Close (Sticky)
                 wristAdjustMoreStatus.update(gamepad2.right_bumper);             //Wrist Adjust +
 
                 startButton2Status.update(gamepad2.start);             //Pad Select (A & B)
@@ -526,8 +526,8 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
              * Hook Controls
              ****************/
 
-            if (hooksDownButtonStatus.isDown) { HooksDown(); }
-            if (hooksUpButtonStatus.isDown) { HooksUp(); }
+            if (hooksDownButtonStatus.clickedDown) { HooksDown(); }
+            if (hooksUpButtonStatus.clickedDown) { HooksUp(); }
 
             /*************************
              * Chassis drive controls
@@ -556,7 +556,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                     arm.setPower(-1 * (defaultArmPower * (handVerticalStick) - 0.2));
                 } else {
 
-                    if (handVerticalStick > 0) {
+                    if (handVerticalStick < 0) {
                         arm.setPower(defaultArmPower * (-handVerticalStick));
                     } else {
                         arm.setPower(defaultArmLowerPower * (-handVerticalStick));
@@ -733,6 +733,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                 }
                 DrivePower(0);
                 Thread.sleep(pause);
+                StopAndResetDriveEncoders();
             }
         }
     }
@@ -749,6 +750,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                 }
                 DrivePower(0);
                 Thread.sleep(pause);
+                StopAndResetDriveEncoders();
             }
         }
     }
@@ -765,6 +767,7 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
                 }
                 DrivePower(0);
                 Thread.sleep(pause);
+                StopAndResetDriveEncoders();
             }
         }
     }
@@ -778,6 +781,12 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
         }
         if (stackDistance<0){
             stackDistance = findStackDistance();
+        }
+        if(stackLevel>stackHeightOnLevelArray.length-1){
+            stackLevel = stackHeightOnLevelArray.length-1;
+        }
+        if(stackDistance>stackDistanceArray.length-1){
+            stackDistance = stackDistanceArray.length-1;
         }
         if (stackLevel >= 0 && stackDistance >= 0) {
             // Check if the stone is getting set down on a level and go slow if so
@@ -893,25 +902,25 @@ public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
             //Light Reverse Power On
             leftHook.setPosition(leftHookDownPosition);
             rightHook.setPosition(rightHookDownPosition);
-            lightReverse();
-            sleep(1500);
+            //lightReverse();
+            //sleep(1500);
 
             //Reverse Power Off
-            StopAndResetDriveEncoders();
+            //StopAndResetDriveEncoders();
         }
     }
     public void HooksUp() {
         if(hasArmMotorsAndServos) {
             leftHook.setPosition(leftHookUpPosition);
             rightHook.setPosition(rightHookUpPosition);
-            sleep(1500);
+            //sleep(1500);
         }
     }
     public void HooksIn() {
         if(hasArmMotorsAndServos) {
             leftHook.setPosition(leftHookInPosition);
             rightHook.setPosition(rightHookInPosition);
-            sleep(500);
+            //sleep(500);
         }
     }
     public void lightReverse() throws InterruptedException{
