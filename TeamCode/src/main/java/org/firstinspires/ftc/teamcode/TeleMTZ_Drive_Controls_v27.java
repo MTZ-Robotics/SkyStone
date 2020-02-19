@@ -63,14 +63,14 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo
 import static org.firstinspires.ftc.teamcode.mtzConstants.yellowWarningTime;
 
 
-@TeleOp(name="TeleMTZ_Drive_Controls_v26 Coriander", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_v27 Tarragon", group ="A_Top")
 
 //Adds run to position to controls map
 //Adds control map error handling
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls_v26 extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
 
     /********************************
      * Robot Configuration Flags
@@ -888,7 +888,7 @@ public class TeleMTZ_Drive_Controls_v26 extends LinearOpMode {
                     armExtension.setPower(defaultArmExtensionPower);
                     //Wrist Position is set once so it doesn't try to go to 2 different positions each loop iteration
                     // wrist.setPosition(wristPositionDesired);
-                    while (arm.isBusy() && armExtension.isBusy()) {
+                    while (arm.isBusy() || armExtension.isBusy()) {
                         DisplayArmTelemetry();
                     }
                 }
@@ -905,7 +905,7 @@ public class TeleMTZ_Drive_Controls_v26 extends LinearOpMode {
             if (opModeIsActive()) {
                 raiseByDegrees(degrees);
                 ArmPower(power);
-                while (arm.isBusy() && armExtension.isBusy()) {
+                while (arm.isBusy() || armExtension.isBusy()) {
                     DisplayArmTelemetry();
                 }
             }
@@ -918,7 +918,7 @@ public class TeleMTZ_Drive_Controls_v26 extends LinearOpMode {
             if (opModeIsActive()) {
                 raiseByDegrees(-degrees);
                 ArmPower(power);
-                while (arm.isBusy() && armExtension.isBusy()) {
+                while (arm.isBusy() || armExtension.isBusy()) {
                     DisplayArmTelemetry();
                 }
             }
@@ -942,7 +942,7 @@ public class TeleMTZ_Drive_Controls_v26 extends LinearOpMode {
                 armExtension.setTargetPosition((int) (armExtensionInches * ticksPerInchExtension));
                 armExtension.setPower(power);
 
-                while (arm.isBusy() && armExtension.isBusy()) {
+                while (arm.isBusy() || armExtension.isBusy()) {
                     DisplayArmTelemetry();
                 }
             }

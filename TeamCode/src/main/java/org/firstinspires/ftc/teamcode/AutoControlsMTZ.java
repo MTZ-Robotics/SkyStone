@@ -14,6 +14,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.defaultArmPower;
 import static org.firstinspires.ftc.teamcode.mtzConstants.skyStonePosition;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeArm;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChassis;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
 
 @Autonomous(name ="Auto Controls [47]", group = "z_test")
 //Adds adjustment variables
@@ -54,6 +55,7 @@ public class AutoControlsMTZ extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
+    private DcMotor armExtension;
     private Servo claw;
     private Servo leftHook;
     private Servo rightHook;
@@ -90,6 +92,7 @@ public class AutoControlsMTZ extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
+        armExtension = hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
@@ -210,7 +213,7 @@ public class AutoControlsMTZ extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Line up in front of left and center stone near bridge facing quarry");
+            telemetry.log().add("Line up in front of the line between the last 2 stones on the end of the quarry near bridge facing quarry");
             waitForStart();
             //Turn lights off
             if (alliance=="Blue") {
@@ -222,21 +225,33 @@ public class AutoControlsMTZ extends LinearOpMode {
             /************
              * Path Start
              ************/
-            //Move forward slightly
-            /***********************************
-             * This code has not yet been tested
-             ***********************************/
-            Drive(10, defaultDriveSpeed, defaultPauseTime);
-            Drive(2,0.05,defaultPauseTime);
+            //Move forward to quarry (quarry distance-robot length-distance from stone to measure)
+            Drive(48-18-3, .2, defaultPauseTime);
             sampleSkyStone(allianceReverser);
+            //Strafe to SkyStone Position
+            double distanceFromStone3ToSkyStone=0;
+            if(skyStonePosition==3){
+                Strafe(allianceReverser*4,.2,defaultPauseTime);
+                distanceFromStone3ToSkyStone = 0;
+            } else if(skyStonePosition==2){
+                Strafe(allianceReverser*-4,.2,defaultPauseTime);
+                distanceFromStone3ToSkyStone = 8;
+            }else if(skyStonePosition==1){
+                Strafe(allianceReverser*-12,.2,defaultPauseTime);
+                distanceFromStone3ToSkyStone = 16;
+            }
+            //Raise Arm a little
+            RaiseArm(2,defaultPauseTime);
+            //Extend Arm
+            ExtendArm(4,1,defaultPauseTime);
             grabSkyStone(allianceReverser);
-            //Reverse
+            //Reverse to clear bridge post
             Drive(-12,defaultDriveSpeed,defaultPauseTime);
-            //Strafe past line with block
-            Strafe(-3*24,defaultDriveSpeed,defaultPauseTime);
-            //Turn(allianceReverser * -90,defaultTurnSpeed,defaultPauseTime);
-            //Forward
+            //Strafe to foundation with block and add on any distance past stone 3 location
+            Strafe((-3*24)+8 + (int)distanceFromStone3ToSkyStone,defaultDriveSpeed,defaultPauseTime);
+            //Forward since we are past bridge post
             Drive(12,defaultDriveSpeed,defaultPauseTime);
+
             moveFoundation(allianceReverser);
             //Align to Park
             if (pathToRun=="DepotSampleBridge") {
@@ -396,7 +411,7 @@ public class AutoControlsMTZ extends LinearOpMode {
 
     public void quarryToMovedFoundation (int allianceReverser) throws InterruptedException{
         /*********
-         * * Turn bridge to Building Site 90° Fast
+         * Turn bridge to Building Site 90° Fast
          * Strafe towards Wall 24 Fast
          * Forward with tweak towards Wall for 96
          * Strafe Bridge and forward 6
@@ -409,65 +424,52 @@ public class AutoControlsMTZ extends LinearOpMode {
     }
 
     public void grabSkyStone(int allianceReverser) throws InterruptedException {//Angle towards skystone
-        if (skyStonePosition==1) {
-            Strafe(allianceReverser * -8,defaultDriveSpeed / 2,defaultPauseTime);
-            //Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
-        } else if (skyStonePosition==3) {
-            Strafe(allianceReverser * 8,defaultDriveSpeed / 2,defaultPauseTime);
-            //Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
-        }
-        //Drive(21,defaultDriveSpeed/2,defaultPauseTime);
-        RaiseArm(-2,defaultPauseTime);
         //CloseClaw();
         claw.setPosition(clawClosedPosition);
+        //Wait for it to close
         sleep(1000);
+        //Raise Arm
         RaiseArm(4,defaultPauseTime);
-        Drive(-4,defaultDriveSpeed/2,defaultPauseTime);
-        //reorient back to facing quarry
-        if (skyStonePosition==1) {
-            Strafe(allianceReverser * 8,defaultDriveSpeed / 2,defaultPauseTime);
-            //Turn(allianceReverser * 30, defaultTurnSpeed / 2, defaultPauseTime);
-        } else if (skyStonePosition==3) {
-            Strafe(allianceReverser * -8,defaultDriveSpeed / 2,defaultPauseTime);
-            //Turn(allianceReverser * -30, defaultTurnSpeed / 2, defaultPauseTime);
-        }
     }
 
     //Sampling Methods
 
     public void sampleSkyStone (int allianceReverser) throws InterruptedException {
         //Determine which of the 3 positions to go after
-        //position 1 = audience side
-        //position 2 = middle
-        //position 3 = bridge side
-        // if blue alliance and location = right, then position 1
+        //position 1 = audience side (Red)
+        //position 2 = middle        (Yellow)
+        //position 3 = bridge side   (Green)
+        // if blue alliance and location = right, then position 2
         // if Red alliance and location = right, then position 3
 
         int skyStoneLocation = determineSkyStoneColorSensor();
 
+        skyStonePosition = 3;
+        pattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
         if (skyStoneLocation == 1) {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
-            blinkinLedDriver.setPattern(pattern);
             if (allianceReverser == 1) {
                 skyStonePosition = 3;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
             } else {
-                skyStonePosition = 1;
+                skyStonePosition = 2;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
             }
 
         } else if (skyStoneLocation == 2) {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
-            blinkinLedDriver.setPattern(pattern);
-            skyStonePosition = 2;
-
-        } else if (skyStoneLocation == 3) {
-            pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
-            blinkinLedDriver.setPattern(pattern);
             if (allianceReverser == 1) {
-                skyStonePosition = 1;
+                skyStonePosition = 2;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.YELLOW;
             } else {
                 skyStonePosition = 3;
+                pattern = RevBlinkinLedDriver.BlinkinPattern.GREEN;
             }
+
+        } else if (skyStoneLocation == 0) {
+            pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+            skyStonePosition = 1;
         }
+        blinkinLedDriver.setPattern(pattern);
+
     }
     public int determineSkyStoneColorSensor() {
         float lefthsvValues[] = {0F, 0F, 0F};
@@ -476,9 +478,9 @@ public class AutoControlsMTZ extends LinearOpMode {
         Color.RGBToHSV(rightColorSensor.red() * 8, rightColorSensor.green() * 8, rightColorSensor.blue() * 8, righthsvValues);
 
         // Left = 1
-        //Center = 2
-        //Right = 3
-        int skyStonePos = 3;
+        // Right = 2
+        // Not Seen = 0
+        int skyStonePos = 0;
 
         if(lefthsvValues[0]>60){
             skyStonePos = 1;
@@ -557,6 +559,17 @@ public class AutoControlsMTZ extends LinearOpMode {
         ArmPower(0);
         Thread.sleep(pause);
 
+    }
+    public void ExtendArm(double additionalExtension, double power,int pause) throws InterruptedException {
+        if (opModeIsActive()) {
+            armExtension.setTargetPosition((int) ((armExtension.getCurrentPosition() + additionalExtension) * ticksPerInchExtension));
+            armExtension.setPower(power);
+            while (arm.isBusy() || armExtension.isBusy()) {
+                DisplayArmTelemetry();
+            }
+            armExtension.setPower(0);
+        }
+        Thread.sleep(pause);
     }
     public void HooksDown()throws InterruptedException {
         //Light Reverse Power On

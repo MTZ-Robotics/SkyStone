@@ -63,7 +63,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo
 import static org.firstinspires.ftc.teamcode.mtzConstants.yellowWarningTime;
 
 
-@TeleOp(name="TeleMTZ_Drive_Controls (v26)", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls [v26]", group ="A_Top")
 
 //Adds run to position to controls map
 //Adds control map error handling
