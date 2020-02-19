@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,7 +11,7 @@ import org.firstinspires.ftc.teamcode.TeleMTZ_Lights_Timer;
 
 @TeleOp(name="TeleMTZ_Drive_Controls_v22B", group ="A_Top")
 
-//@Disabled
+@Disabled
 
 public class z_test_TeleMTZ_Drive_Controls_v22_B extends LinearOpMode {
 

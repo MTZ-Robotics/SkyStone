@@ -80,6 +80,7 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
     boolean hasArmMotorsAndServos;
     boolean hasExpansionHubConnected;
     boolean hasLightsHub;
+    boolean wantAutoChassisControls;
 
     /********************************
      * Timer Variables
@@ -219,6 +220,7 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
         hasArmMotorsAndServos = true;
         hasExpansionHubConnected = true;
         hasLightsHub = true;
+        wantAutoChassisControls = true;
 
         /***********************
          * Modifiable variables
@@ -588,6 +590,10 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
              * Chassis drive controls
              *************************/
             if(hasChassisMotors) {
+                //Set motors to run manually
+
+
+
                 backLeft.setPower(drivePower * ((driveStick1 + strafeStick) - turnStick));
                 backRight.setPower(drivePower * ((driveStick1 - strafeStick) + turnStick));
                 frontLeft.setPower(drivePower * ((-driveStick1 + strafeStick) + turnStick));
@@ -596,12 +602,26 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
             /*************************
              * Chassis bump controls
              *************************/
-            if(chassisBumpForwardStatus.clickedDown){ Drive(driveBump,.5,0); }
-            if(chassisBumpBackStatus.clickedDown){ Drive(driveBump,.5,0); }
-            if(chassisBumpLeftStrafeStatus.clickedDown){ Strafe(strafeBump,.5,0); }
-            if(chassisBumpRightStrafeStatus.clickedDown){ Strafe(-strafeBump,.5,0); }
-            if(chassisBumpLeftTurnStatus.clickedDown){ Turn(-turnBump,.5,0); }
-            if(chassisBumpRightTurnStatus.clickedDown){ Turn(turnBump,.5,0); }
+            if(hasChassisMotors && wantAutoChassisControls) {
+                if (chassisBumpForwardStatus.clickedDown) {
+                    Drive(driveBump, .5, 0);
+                }
+                if (chassisBumpBackStatus.clickedDown) {
+                    Drive(driveBump, .5, 0);
+                }
+                if (chassisBumpLeftStrafeStatus.clickedDown) {
+                    Strafe(strafeBump, .5, 0);
+                }
+                if (chassisBumpRightStrafeStatus.clickedDown) {
+                    Strafe(-strafeBump, .5, 0);
+                }
+                if (chassisBumpLeftTurnStatus.clickedDown) {
+                    Turn(-turnBump, .5, 0);
+                }
+                if (chassisBumpRightTurnStatus.clickedDown) {
+                    Turn(turnBump, .5, 0);
+                }
+            }
 
             /*************
              * Arm Controls
@@ -786,9 +806,7 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                 while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
                     DisplayDriveTelemetry();
                 }
-                DrivePower(0);
                 Thread.sleep(pause);
-                StopAndResetDriveEncoders();
             }
         }
     }
@@ -803,9 +821,7 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                 while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
                     DisplayDriveTelemetry();
                 }
-                DrivePower(0);
                 Thread.sleep(pause);
-                StopAndResetDriveEncoders();
             }
         }
     }
@@ -820,9 +836,7 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                 while (frontLeft.isBusy() && frontRight.isBusy() && backLeft.isBusy() && backRight.isBusy()) {
                     DisplayDriveTelemetry();
                 }
-                DrivePower(0);
                 Thread.sleep(pause);
-                StopAndResetDriveEncoders();
             }
         }
     }
@@ -893,8 +907,6 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                     }
                 }
 
-                arm.setPower(0);
-                armExtension.setPower(0);
             }
             Thread.sleep(defaultPauseTime);
         }
@@ -909,7 +921,6 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                     DisplayArmTelemetry();
                 }
             }
-            ArmPower(0);
             Thread.sleep(pause);
         }
     }
@@ -922,7 +933,6 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                     DisplayArmTelemetry();
                 }
             }
-            ArmPower(0);
             Thread.sleep(pause);
         }
     }
@@ -946,9 +956,6 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
                     DisplayArmTelemetry();
                 }
             }
-        }
-        if(hasArmMotorsAndServos){
-            armExtension.setPower(0);
         }
         Thread.sleep(pause);
     }
