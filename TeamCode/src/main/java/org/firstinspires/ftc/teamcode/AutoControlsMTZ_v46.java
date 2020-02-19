@@ -15,7 +15,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.*;
 @Autonomous(name ="Auto Controls v.46 Rosemary", group = "z_test")
 //Adds adjustment variables
 //Adds additional paths for sensed auto
-//@Disabled
+@Disabled
 
 public class AutoControlsMTZ_v46 extends LinearOpMode {
 

@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
-@Autonomous(name ="Auto Controls v47 Enchilada", group = "z_test")
+@Autonomous(name ="Auto Controls w Gyro", group = "z_test")
 
 //@Disabled
 

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleBravesRightStrafe extends TeleMTZ_Drive_Controls {
 
 
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         String controlPadMap = "SkyStone Braves Right Strafe";
         boolean spurGearArm = false;
         double driveSpeed = 0.5;

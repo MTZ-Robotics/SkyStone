@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,7 +16,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.*;
 //Adds run to position to controls map
 //Adds control map error handling
 
-//@Disabled
+@Disabled
 
 public class TeleMTZ_Drive_Controls_v25 extends LinearOpMode {
 

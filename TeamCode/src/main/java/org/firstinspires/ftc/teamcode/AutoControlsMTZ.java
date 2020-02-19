@@ -15,7 +15,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.skyStonePosition;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeArm;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChassis;
 
-@Autonomous(name ="Auto Controls (v.47)", group = "z_test")
+@Autonomous(name ="Auto Controls [47]", group = "z_test")
 //Adds adjustment variables
 //Adds additional paths for sensed auto
 //@Disabled
@@ -95,7 +95,7 @@ public class AutoControlsMTZ extends LinearOpMode {
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
         leftColorSensor = hardwareMap.get(ColorSensor.class, "sensor_color");;
-        //rightColorSensor = hardwareMap.colorSensor.get("sensor_color2");
+        rightColorSensor = hardwareMap.get(ColorSensor.class, "sensor_color2");
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
@@ -210,7 +210,7 @@ public class AutoControlsMTZ extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Line up in front of second stone from bridge facing quarry");
+            telemetry.log().add("Line up in front of left and center stone near bridge facing quarry");
             waitForStart();
             //Turn lights off
             if (alliance=="Blue") {
@@ -473,17 +473,17 @@ public class AutoControlsMTZ extends LinearOpMode {
         float lefthsvValues[] = {0F, 0F, 0F};
         Color.RGBToHSV(leftColorSensor.red() * 8, leftColorSensor.green() * 8, leftColorSensor.blue() * 8, lefthsvValues);
         float righthsvValues[] = {0F, 0F, 0F};
-        //Color.RGBToHSV(rightColorSensor.red() * 8, rightColorSensor.green() * 8, rightColorSensor.blue() * 8, righthsvValues);
+        Color.RGBToHSV(rightColorSensor.red() * 8, rightColorSensor.green() * 8, rightColorSensor.blue() * 8, righthsvValues);
 
         // Left = 1
         //Center = 2
         //Right = 3
-        int skyStonePos = 2;
+        int skyStonePos = 3;
 
         if(lefthsvValues[0]>60){
             skyStonePos = 1;
-        } else if(righthsvValues[0]>60){
-            skyStonePos = 3;
+        } else if(righthsvValues[0]>90){
+            skyStonePos = 2;
         }
 
         return skyStonePos;
