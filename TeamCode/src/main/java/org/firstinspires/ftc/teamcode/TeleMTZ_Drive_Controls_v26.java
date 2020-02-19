@@ -63,14 +63,14 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo
 import static org.firstinspires.ftc.teamcode.mtzConstants.yellowWarningTime;
 
 
-@TeleOp(name="TeleMTZ_Drive_Controls (v26)", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_v26 Coriander", group ="A_Top")
 
 //Adds run to position to controls map
 //Adds control map error handling
 
 //@Disabled
 
-public class TeleMTZ_Drive_Controls extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v26 extends LinearOpMode {
 
     /********************************
      * Robot Configuration Flags

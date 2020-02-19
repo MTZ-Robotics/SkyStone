@@ -53,7 +53,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 
 @TeleOp(name="Test 2 SKYSTONE Targeting", group ="z_test")
-//@Disabled
+@Disabled
 public class z_test_SkyStone_Targeting_2 extends LinearOpMode {
 
     /********

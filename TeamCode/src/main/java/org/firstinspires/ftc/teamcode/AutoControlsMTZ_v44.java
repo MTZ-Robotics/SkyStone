@@ -1,29 +1,30 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="Auto with color sensor v1 Dark Chocolate", group = "b_concept")
+@Autonomous(name ="Auto Controls v44 Paprika", group = "z_test")
 
-@Disabled
+//@Disabled
 
-public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
+public class AutoControlsMTZ_v44 extends LinearOpMode {
 
-    /**********************************************************
+
+    /**************
+     *
      * Modify these speeds to help with diagnosing drive errors
-     **********************************************************/
+     *
+     **************/
     private static final double defaultDriveSpeed = 0.2;
     private static final double defaultTurnSpeed = 0.4;
     private static final int defaultPauseTime = 200;
 
-    /****************************************************
+    /**********************
      * These variables are the constants in path commands
-     ****************************************************/
+     **********************/
     private static final double ticksPerRevolution = 145.6;
     private static final double gearReduction = 2.0;
     private static final double wheelDiameterInches = 4.0;
@@ -32,120 +33,113 @@ public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
     private static final double experimentalInchesPerTurn = 91.8;
     private int allianceReverser = 1;
 
-    /*******************************
+    /*****************
      * Declare motor & servo objects
-     *******************************/
+     ****************/
     private DcMotor frontRight;
     private DcMotor backRight;
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private DcMotor arm;
-    private DcMotor armExtension;
     private Servo claw;
-    private Servo wrist;
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
-    private Servo leftStoneHook;
-    private Servo rightStoneHook;
-    private ColorSensor leftColorSensor;
-    private ColorSensor rightColorSensor;
 
-    /*****************************
+
+    /***********
      * Lights Control Declarations
-     *****************************/
+     ***********/
+
     RevBlinkinLedDriver blinkinLedDriver;
     RevBlinkinLedDriver.BlinkinPattern pattern;
 
     @Override
-    /***********************************************
-     * RUN PATH HERE   RUN PATH HERE   RUN PATH HERE
-     ***********************************************/
+
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","DepotWall",false);
+        autoPaths("Blue","FoundationWall",false);
+
     }
 
     public void autoPaths(String alliance,String pathToRun,Boolean supportArm) throws InterruptedException {
 
         boolean oldArm = supportArm;
 
-        /***********************
-         * Map Motors and Servos
-         ***********************/
+        /**************
+         *
+         * Declare motors and servos
+         *
+         */
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
-        armExtension = hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
-        wrist = hardwareMap.servo.get("wrist");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
         blockThrower = hardwareMap.servo.get("blockThrower");
 
-        leftColorSensor = hardwareMap.colorSensor.get("color_sensor");
-        //rightColorSensor = hardwareMap.colorSensor.get("color_sensor2");
-
-        leftColorSensor = hardwareMap.colorSensor.get("sensor_color");
-        //rightColorSensor = hardwareMap.colorSensor.get("sensor_color2");
-
-
-        /********************************
-         * Set Motor and Servo Directions
-         ********************************/
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        arm.setDirection(DcMotor.Direction.REVERSE);
-        armExtension.setDirection(DcMotor.Direction.REVERSE);
+        /**********
+         * Commenting out arm reverse to see if it will keep the arm in the correct direction
+         */
+        //arm.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
-        /****************************************************
+
+        /*************
          * Set Lights Variables to the color for the alliance
-         ****************************************************/
+         *************/
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+
         if (alliance=="Blue") {
+
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE;
         } else if (alliance=="Red") {
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
         }
         blinkinLedDriver.setPattern(pattern);
 
-        /***************************
-         * Initialization Procedures
-         ***************************/
-        //Servo Movements
+
+        /********
+         * Movement starts here on initialize
+         */
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
 
         StopAndResetAllEncoders();
 
-        //Motor Movements
+        /************
+         * Raise the arm to fit within 18" long dimension
+         ************/
         if (oldArm) {
            RaiseArm(14,defaultPauseTime/4);
         }
-
-        //Telemetry Update
         telemetry.log().clear();
         telemetry.update();
         telemetry.log().add(pathToRun+" Initialized. Go "+alliance+" alliance");
 
-        //Set alliance reverser value based on blue or red
-        allianceReverser = 1;
+
+        //Paths written for Blue alliance and reverse turns if on Red alliance
+        allianceReverser=1;
         if (alliance=="Red") {
-            allianceReverser = -1;
+            allianceReverser=-1;
         }
 
-        /*******************************************************
-         * Paths   Paths   Paths   Paths   Paths   Paths   Paths
-         *******************************************************/
+
+
+        /************************************************************
+         * Paths            Paths            Paths          Paths   *
+         ************************************************************/
         //Write paths for Blue alliance and apply reverser on turns and strafes
 
         if (pathToRun=="FoundationBridge" || pathToRun=="FoundationWall" ) {
 
-            /*********************************
+            /************************************
              * Path set up -- Add to each path
-             *********************************/
+             ***********************************/
             //Robot Setup Notes
             telemetry.log().add("Robot should face towards wall centered in tile next to bridge.");
 
@@ -162,6 +156,7 @@ public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
             /************
              * Path Start
              ************/
+
             goToFoundationfromWall(allianceReverser);
             moveFoundation(allianceReverser);
 
@@ -184,12 +179,11 @@ public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
             //Park
             Drive(14, defaultDriveSpeed/2, 0);
         } else if (pathToRun=="DepotWall" || pathToRun=="DepotBridge") {
-
-            /*********************************
+            /************************************
              * Path set up -- Add to each path
-             *********************************/
+             ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Robot starts facing quarry in the middle of the center tile on the depot side.");
+            telemetry.log().add("Robot starts facing quarry on intersection between tiles one tile away from bridge line.");
 
             waitForStart();
 
@@ -201,46 +195,28 @@ public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
             }
             blinkinLedDriver.setPattern(pattern);
 
-            //Store color sensor values
-            float leftHsvValues[] = {0F,0F,0F};
-                final float leftValues[] = leftHsvValues;
-            float rightHsvValues[] = {0F,0F,0F};
-                final float rightValues [] = rightHsvValues;
-
-            //Enable color sensor LED
-            leftColorSensor.enableLed(true);
-            rightColorSensor.enableLed(true);
-
             /************
              * Path Start
              ************/
-            //Drive to stones
-            Drive(12,0.25,0);
-            Drive(4,0.05,100);
-            //If color sensor needs time to read values, increase pause above
 
-            if (rightHsvValues[0] > 60) {
-                telemetry.addLine()
-                        .addData("Skystone Location: ", "right");
-            } else if (leftHsvValues[0] > 60) {
-                telemetry.addLine()
-                        .addData("Skystone Location: ", "left");
+            //Wait 15 seconds
+            sleep(15000);
+
+            if (pathToRun=="DepotWall"){
+                //Move forward slightly
+                Drive(1,defaultDriveSpeed,defaultPauseTime);
             } else {
-                telemetry.addLine()
-                        .addData("Skystone Location: ", "center");
+                //Move forward more
+                Drive(12,defaultDriveSpeed,defaultPauseTime);
             }
 
-            //If right, slide right, grab, deliver, return to wall (adjusting 8" right)
-            //If left, slide left, grab, deliver, return to wall (adjusting 8" left)
-            //If center, grab, deliver, return to wall (no translation)
+            //Lower arm
+            LowerArm(10,defaultPauseTime*2);
+            RaiseArm(3,defaultPauseTime);
 
-            //Align to sample second time
+            //Park
+            Strafe(allianceReverser * -24,defaultDriveSpeed,0);
 
-            //If right, slide right, grab, deliver, park (adjusting 8" right)
-            //If left, push middle stone away, rotate left, grab, realign, deliver, park
-            //If center, grab, deliver, park (no translation)
-
-            //If objective completed early, consider returning for more stones
         }
     }
 
@@ -352,31 +328,10 @@ public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
         //Reverse Power Off
         StopAndResetDriveEncoders();
     }
-
     public void HooksUp() {
         leftHook.setPosition(0.5);
         rightHook.setPosition(0.5);
         sleep(1500);
-    }
-
-    public void StoneHooksUp() {
-        leftStoneHook.setPosition(0);
-        rightStoneHook.setPosition(0);
-    }
-
-    public void LeftStoneHookDown() {
-        leftStoneHook.setPosition(1);
-    }
-
-    public void RightStoneHookDown() {
-        rightStoneHook.setPosition(1);
-    }
-    public void CloseClaw() {
-        claw.setPosition(-1);
-    }
-
-    public void OpenClaw() {
-        claw.setPosition(0);
     }
     public void lightReverse() throws InterruptedException{
 
