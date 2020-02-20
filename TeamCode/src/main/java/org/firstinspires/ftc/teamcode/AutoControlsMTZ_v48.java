@@ -108,20 +108,22 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
          *************/
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        if (alliance=="Blue") {
+        //Paths written for Blue alliance and reverse turns if on Red alliance
 
+        if (alliance=="Blue") {
+            allianceReverser = 1;
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE;
         } else if (alliance=="Red") {
+            allianceReverser = -1;
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
         }
         blinkinLedDriver.setPattern(pattern);
 
-
         /********
          * Movement starts here on initialize
          */
-        leftHook.setPosition(0.5);
-        rightHook.setPosition(0.5);
+        leftHook.setPosition(leftHookUpPosition);
+        rightHook.setPosition(rightHookUpPosition);
 
         StopAndResetAllEncoders();
 
@@ -135,11 +137,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         telemetry.update();
         telemetry.log().add(pathToRun+" Initialized. Go "+alliance+" alliance");
 
-        //Paths written for Blue alliance and reverse turns if on Red alliance
-        allianceReverser=1;
-        if (alliance=="Red") {
-            allianceReverser=-1;
-        }
+
         /************************************************************
          * Paths            Paths            Paths          Paths   *
          ************************************************************/
@@ -225,13 +223,13 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             //Strafe to SkyStone Position
             double distanceFromStone3ToSkyStone=0;
             if(skyStonePosition==3){
-                Strafe(allianceReverser*4,.2,defaultPauseTime);
+                Strafe(allianceReverser * 4,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 0;
             } else if(skyStonePosition==2){
-                Strafe(allianceReverser*-4,.2,defaultPauseTime);
+                Strafe(allianceReverser * -4,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 8;
             }else if(skyStonePosition==1){
-                Strafe(allianceReverser*-12,.2,defaultPauseTime);
+                Strafe(allianceReverser * -12,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 16;
             }
             //Raise Arm a little
@@ -354,9 +352,9 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         // End of Paths
     }
 
-
-
-    //Path Methods
+    /**********************
+     * Path Methods
+     **********************/
     public void goToFoundationfromWall(int allianceReverser) throws InterruptedException{
 
         //Align Hooks With Foundation
