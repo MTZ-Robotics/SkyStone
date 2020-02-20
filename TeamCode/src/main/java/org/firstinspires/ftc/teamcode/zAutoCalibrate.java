@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 //@Disabled
 public class zAutoCalibrate extends AutoControlsMTZ {
     public void runOpMode() throws InterruptedException {
-
         super.autoPaths("Red","Calibrate",false);
     }
 

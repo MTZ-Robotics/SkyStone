@@ -67,7 +67,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
 @Autonomous(name ="MTZ Autonomous Sandbox", group="Concept")
-//@Disabled
+@Disabled
 
 
 public class MTZ_Autonomous_SandBox extends LinearOpMode {

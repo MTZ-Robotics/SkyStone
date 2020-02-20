@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name ="Auto with color sensor v1 Dark Chocolate", group = "b_concept")
 
-//@Disabled
+@Disabled
 
 public class AutoControlsMTZ_ColorSensorSample extends LinearOpMode {
 

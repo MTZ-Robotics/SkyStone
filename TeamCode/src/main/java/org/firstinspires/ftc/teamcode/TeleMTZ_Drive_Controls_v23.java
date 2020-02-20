@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="TeleMTZ_Drive_Controls_v24 Turmeric", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls_v23 Aspartame", group ="A_Top")
 
 @Disabled
 
-public class TeleMTZ_Drive_Controls_v24 extends LinearOpMode {
+public class TeleMTZ_Drive_Controls_v23 extends LinearOpMode {
 
     /********************************
      * Timer Variables

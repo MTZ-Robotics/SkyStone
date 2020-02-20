@@ -2,16 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name="Hunchamuncha Left Strafe", group ="A_Top")
+@TeleOp(name="Hand Turkey Right Strafe", group ="A_Top")
 
 //@Disabled
 
-public class TeleHunchamunchaLeftStrafe extends TeleMTZ_Drive_Controls {
+public class TeleBravesRightStrafe extends TeleMTZ_Drive_Controls {
 
 
-    public void runOpMode() {
-
-        String controlPadMap = "SkyStone Hunchamuncha Left Strafe";
+    public void runOpMode() throws InterruptedException {
+        String controlPadMap = "SkyStone Braves Right Strafe";
         boolean spurGearArm = false;
         double driveSpeed = 0.5;
         telemetry.log().add("Controls Map:"+controlPadMap+", Arm Support:"+spurGearArm+", Drive Power:"+driveSpeed);

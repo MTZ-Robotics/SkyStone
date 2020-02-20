@@ -7,11 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name ="Auto Controls stone grab", group = "z_test")
+@Autonomous(name ="Auto Controls v44 Paprika", group = "z_test")
 
 @Disabled
 
-public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
+public class AutoControlsMTZ_v44 extends LinearOpMode {
 
 
     /**************
@@ -43,8 +43,6 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
     private DcMotor backLeft;
     private DcMotor arm;
     private Servo claw;
-    private DcMotor armExtender;
-    private Servo wrist;
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
@@ -60,7 +58,7 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
     @Override
 
     public void runOpMode() throws InterruptedException {
-        autoPaths("Blue","DepotWall",false);
+        autoPaths("Blue","FoundationWall",false);
 
     }
 
@@ -78,8 +76,6 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
-        wrist = hardwareMap.servo.get("wrist");
-        armExtender = hardwareMap.dcMotor.get("armExtension");
         claw = hardwareMap.servo.get("claw");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
@@ -203,56 +199,16 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
             /************
              * Path Start
              ************/
-            extendArm(198,1,50);
 
-            Drive(36, 0.5,50);
-
-            claw.setPosition(1);
-
-            Drive(-4,0.5,50);
-
-            Strafe(-48*allianceReverser,0.5,50);
-
-            claw.setPosition(0);
-
-            Drive(-4,0.5,50);
-
-            Strafe(44*allianceReverser,0.5,50);
-
-            Drive(8,0.5,50);
-
-            claw.setPosition(1);
-
-            Drive(-4,0.5,50);
-
-            Strafe(-44*allianceReverser,0.5,50);
-
-            claw.setPosition(0);
-
-            Drive(-4,0.5,50);
-
-            Strafe(40*allianceReverser,0.5,50);
-
-            Drive(8,0.5,50);
-
-            claw.setPosition(1);
-
-            Drive(-4,0.5,50);
-
-            Strafe(-40*allianceReverser,0.5,50);
-
-            claw.setPosition(0);
-
-            Drive(-4,0.5,50);
-
-
+            //Wait 15 seconds
+            sleep(15000);
 
             if (pathToRun=="DepotWall"){
-                Strafe(12*allianceReverser,0.5,50);
+                //Move forward slightly
+                Drive(1,defaultDriveSpeed,defaultPauseTime);
             } else {
                 //Move forward more
-                Drive(-12,0.5,50);
-                Strafe(12*allianceReverser,0.5,50);
+                Drive(12,defaultDriveSpeed,defaultPauseTime);
             }
 
             //Lower arm
@@ -262,21 +218,6 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
             //Park
             Strafe(allianceReverser * -24,defaultDriveSpeed,0);
 
-        }
-    }
-
-    //ARM EXTENDER
-
-    public void extendArm(int ticks, double motorPower, int pause) throws InterruptedException {
-        if (opModeIsActive()) {
-            armExtender.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            armExtender.setTargetPosition(ticks);
-            armExtender.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armExtender.setPower(motorPower);
-            while (armExtender.isBusy()) {
-            }
-            armExtender.setPower(0);
-            Thread.sleep(pause);
         }
     }
 
@@ -321,7 +262,6 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
             Thread.sleep(pause);
         }
     }
-
     public void Strafe(int distance, double power, int pause) throws InterruptedException {
         if (opModeIsActive()) {
             StopAndResetDriveEncoders();

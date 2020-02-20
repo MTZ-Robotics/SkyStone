@@ -27,7 +27,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 
 @Autonomous(name ="Auto Controls Sampling KV", group = "z_test")
 
-//@Disabled
+@Disabled
 
 public class AutoControlsMTZ_with_sampling_KV extends LinearOpMode {
 
