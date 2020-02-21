@@ -219,19 +219,21 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             /************
              * Path Start
              ************/
+            leftColorSensor.enableLed(false);
+            rightColorSensor.enableLed(false);
             //Move forward to quarry (quarry distance-robot length-distance from stone to measure)
-            Drive(48-18-3, .2, defaultPauseTime);
+            Drive(20, .15, 2000);
             sampleSkyStone(allianceReverser);
             //Strafe to SkyStone Position
             double distanceFromStone3ToSkyStone=0;
             if(skyStonePosition==3){
-                Strafe(allianceReverser*4,.2,defaultPauseTime);
+                Strafe(allianceReverser*8,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 0;
             } else if(skyStonePosition==2){
-                Strafe(allianceReverser*-4,.2,defaultPauseTime);
+                Strafe(0,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 8;
             }else if(skyStonePosition==1){
-                Strafe(allianceReverser*-12,.2,defaultPauseTime);
+                Strafe(allianceReverser*-8,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 16;
             }
             //Raise Arm a little
@@ -242,7 +244,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             //Reverse to clear bridge post
             Drive(-12,defaultDriveSpeed,defaultPauseTime);
             //Strafe to foundation with block and add on any distance past stone 3 location
-            Strafe((-3*24)+8 + (int)distanceFromStone3ToSkyStone,defaultDriveSpeed,defaultPauseTime);
+            Strafe((((-3*24) +8 +(int)distanceFromStone3ToSkyStone)*allianceReverser),defaultDriveSpeed,defaultPauseTime);
             //Forward since we are past bridge post
             Drive(12,defaultDriveSpeed,defaultPauseTime);
 
@@ -254,7 +256,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
                 Strafe(allianceReverser * 12,0.1,200);
             }
             //Forward to bridge area
-            Drive(24, defaultDriveSpeed, defaultPauseTime);
+            Drive(22, defaultDriveSpeed, defaultPauseTime);
             //Park
             Drive(14, defaultDriveSpeed/2, 0);
         } else if (pathToRun=="FoundationSampleWall") {
@@ -476,9 +478,9 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         // Not Seen = 0
         int skyStonePos = 0;
 
-        if(lefthsvValues[0]>60){
+        if(righthsvValues[0]>80){
             skyStonePos = 1;
-        } else if(righthsvValues[0]>90){
+        } else if(lefthsvValues[0]>80){
             skyStonePos = 2;
         }
 
