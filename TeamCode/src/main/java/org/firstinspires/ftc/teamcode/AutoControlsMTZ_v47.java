@@ -11,19 +11,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import static org.firstinspires.ftc.teamcode.mtzConstants.clawClosedPosition;
 import static org.firstinspires.ftc.teamcode.mtzConstants.defaultArmPower;
-import static org.firstinspires.ftc.teamcode.mtzConstants.leftHookUpPosition;
-import static org.firstinspires.ftc.teamcode.mtzConstants.rightHookUpPosition;
 import static org.firstinspires.ftc.teamcode.mtzConstants.skyStonePosition;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeArm;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChassis;
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
 
-@Autonomous(name ="Auto Controls v49 Mulberry", group = "z_test")
-//Adds use of Constants File
-
+@Autonomous(name ="Auto Controls 47 Thyme", group = "z_test")
+//Adds adjustment variables
+//Adds additional paths for sensed auto
 //@Disabled
 
-public class AutoControlsMTZ_v49 extends LinearOpMode {
+public class AutoControlsMTZ_v47 extends LinearOpMode {
 
 
     /**************
@@ -41,7 +39,8 @@ public class AutoControlsMTZ_v49 extends LinearOpMode {
     private static final double ticksPerRevolution = 145.6;
     private static final double gearReduction = 2.0;
     private static final double wheelDiameterInches = 4.0;
-    private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (Math.PI * wheelDiameterInches);
+    private static final double pi = 3.1415;
+    private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
     private static final double experimentalInchesPerTurn = 91.8;
     private static final double armDistanceAdjustment = 200.00;
     private static final double strafeDistanceAdjustment = 1.00;
@@ -115,22 +114,20 @@ public class AutoControlsMTZ_v49 extends LinearOpMode {
          *************/
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        //Paths written for Blue alliance and reverse turns if on Red alliance
-
         if (alliance=="Blue") {
-            allianceReverser = 1;
+
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE;
         } else if (alliance=="Red") {
-            allianceReverser = -1;
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
         }
         blinkinLedDriver.setPattern(pattern);
 
+
         /********
          * Movement starts here on initialize
          */
-        leftHook.setPosition(leftHookUpPosition);
-        rightHook.setPosition(rightHookUpPosition);
+        leftHook.setPosition(0.5);
+        rightHook.setPosition(0.5);
 
         StopAndResetAllEncoders();
 
@@ -144,7 +141,11 @@ public class AutoControlsMTZ_v49 extends LinearOpMode {
         telemetry.update();
         telemetry.log().add(pathToRun+" Initialized. Go "+alliance+" alliance");
 
-
+        //Paths written for Blue alliance and reverse turns if on Red alliance
+        allianceReverser=1;
+        if (alliance=="Red") {
+            allianceReverser=-1;
+        }
         /************************************************************
          * Paths            Paths            Paths          Paths   *
          ************************************************************/
@@ -230,13 +231,13 @@ public class AutoControlsMTZ_v49 extends LinearOpMode {
             //Strafe to SkyStone Position
             double distanceFromStone3ToSkyStone=0;
             if(skyStonePosition==3){
-                Strafe(allianceReverser * 4,.2,defaultPauseTime);
+                Strafe(allianceReverser*4,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 0;
             } else if(skyStonePosition==2){
-                Strafe(allianceReverser * -4,.2,defaultPauseTime);
+                Strafe(allianceReverser*-4,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 8;
             }else if(skyStonePosition==1){
-                Strafe(allianceReverser * -12,.2,defaultPauseTime);
+                Strafe(allianceReverser*-12,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 16;
             }
             //Raise Arm a little
@@ -359,9 +360,9 @@ public class AutoControlsMTZ_v49 extends LinearOpMode {
         // End of Paths
     }
 
-    /**********************
-     * Path Methods
-     **********************/
+
+
+    //Path Methods
     public void goToFoundationfromWall(int allianceReverser) throws InterruptedException{
 
         //Align Hooks With Foundation

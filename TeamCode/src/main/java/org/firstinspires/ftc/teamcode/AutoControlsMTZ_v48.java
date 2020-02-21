@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,7 +15,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.*;
 @Autonomous(name ="Auto Controls v48 Lemongrass", group = "z_test")
 //Adds use of Constants File
 
-//@Disabled
+@Disabled
 
 public class AutoControlsMTZ_v48 extends LinearOpMode {
 
@@ -108,10 +109,13 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
          *************/
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        if (alliance=="Blue") {
+        //Paths written for Blue alliance and reverse turns if on Red alliance
 
+        if (alliance=="Blue") {
+            allianceReverser = 1;
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE;
         } else if (alliance=="Red") {
+            allianceReverser = -1;
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
         }
         blinkinLedDriver.setPattern(pattern);
