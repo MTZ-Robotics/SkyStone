@@ -167,9 +167,9 @@ public class AutoControlsMTZ_StoneGrab extends LinearOpMode {
 
             //Align to Park
             if (pathToRun=="FoundationBridge") {
-                Strafe(allianceReverser * -8, defaultDriveSpeed, defaultPauseTime);
+                Strafe(allianceReverser * 8, defaultDriveSpeed, defaultPauseTime);
             } else {
-                Strafe(allianceReverser * 12,0.1,200);
+                Strafe(allianceReverser * -12,0.1,200);
             }
             //Forward to bridge area
             Drive(24, defaultDriveSpeed, defaultPauseTime);

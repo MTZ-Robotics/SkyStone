@@ -22,8 +22,8 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChas
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
 import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo;
 
-@Autonomous(name ="Auto Controls [49]", group = "z_test")
-//Mulberry
+@Autonomous(name ="Auto Controls [50]", group = "z_test")
+//Strawberry
 
 //Adds use of Constants File
 
@@ -145,7 +145,7 @@ public class AutoControlsMTZ extends LinearOpMode {
          * Raise the arm to fit within 18" long dimension
          ************/
         if (oldArm) {
-           RaiseArm(14,defaultPauseTime/4);
+           RaiseArm(14, defaultArmPower, defaultPauseTime/4);
         }
         telemetry.log().clear();
         telemetry.update();
@@ -245,7 +245,7 @@ public class AutoControlsMTZ extends LinearOpMode {
                 distanceFromStone3ToSkyStone = 16;
             }
             //Raise Arm a little
-            RaiseArm(2,defaultArmPower,defaultPauseTime);
+           // RaiseArm(20 ,defaultArmPower,defaultPauseTime);
             //Get claw & wrist off of arm and ready to grab
             wrist.setPosition(wristPositionDesired);
             claw.setPosition(clawOpenPosition);
@@ -261,17 +261,18 @@ public class AutoControlsMTZ extends LinearOpMode {
             Drive(8,defaultDriveSpeed/2,defaultPauseTime);
             //Open claw to allow block to be pushed into foundation
             claw.setPosition(clawOpenPosition);
-            Drive(4,defaultDriveSpeed/4,defaultPauseTime);
+            //Drive(-4,defaultDriveSpeed/4,defaultPauseTime);
             //Lower Arm a little
-            RaiseArm(-4,defaultArmLowerPower,defaultPauseTime);
-            moveFoundation(allianceReverser);
+           // RaiseArm(-20,defaultArmLowerPower,defaultPauseTime);
+           /// moveFoundation(allianceReverser);
             //Once arm is working, we can use this here
             //claw.setPosition(clawOpenPosition);
             //Align to Park
             if (pathToRun=="DepotSampleBridge") {
-                foundationSlideToBridge(allianceReverser);
+                Drive(-24,defaultDriveSpeed,defaultPauseTime);
+                Strafe(-4,defaultDriveSpeed,defaultPauseTime);
             } else {
-                foundationSlideToWall(allianceReverser);
+                Strafe(-4,defaultDriveSpeed,defaultPauseTime);
             }
             foundationDriveToPark(allianceReverser);
             //Retract Arm
@@ -346,7 +347,7 @@ public class AutoControlsMTZ extends LinearOpMode {
             /************
              * Path Start
              ************/
-            RaiseArm(10,2000);
+            RaiseArm(10,defaultArmPower, 2000);
             Drive(24,defaultDriveSpeed,5000);
             Strafe(24,defaultDriveSpeed,5000);
             Turn(-180,defaultTurnSpeed,0);
@@ -392,9 +393,9 @@ public class AutoControlsMTZ extends LinearOpMode {
         //Move Foundation to Build Zone
         Drive(-20, 0.2, defaultPauseTime);
         Turn(allianceReverser * -40, 0.2, defaultPauseTime);
-        Drive(5, -0.2, defaultPauseTime);
+        Drive(-5, 0.2, defaultPauseTime);
         Turn(allianceReverser * -80, 0.2, defaultPauseTime);
-        Strafe(allianceReverser * -5, 0.2, defaultPauseTime);
+        Strafe(allianceReverser * 5, 0.2, defaultPauseTime);
         Drive(12, 0.1, defaultPauseTime);
 
         //Unhook Foundation
@@ -436,10 +437,10 @@ public class AutoControlsMTZ extends LinearOpMode {
         Drive(24, defaultDriveSpeed*2, defaultPauseTime);
     }
     public void foundationSlideToBridge(int aR) throws InterruptedException{
-        Strafe(aR * -8, defaultDriveSpeed, defaultPauseTime);
+        Strafe(aR * 6, defaultDriveSpeed, defaultPauseTime);
     }
     public void foundationSlideToWall(int aR) throws InterruptedException{
-        Strafe(aR * 12, defaultDriveSpeed, defaultPauseTime);
+        Strafe(aR * -12, defaultDriveSpeed, defaultPauseTime);
     }
     public void foundationDriveToPark(int aR) throws InterruptedException{
         //Forward to bridge area
@@ -453,7 +454,7 @@ public class AutoControlsMTZ extends LinearOpMode {
         //Wait for it to close
         sleep(1000);
         //Raise Arm
-        RaiseArm(4,defaultPauseTime);
+        RaiseArm(2, defaultArmPower, defaultPauseTime);
     }
 
     //Sampling Methods
@@ -506,7 +507,9 @@ public class AutoControlsMTZ extends LinearOpMode {
         // Not Seen = 0
         int skyStonePos = 0;
 
-        //Need to measure this and adjust the constant, L 60, R 90 or 80 for both
+        //Need to measure this and adjust the constant,
+        //Color sensors are different versions; Left is V2 & Right is V3
+        // L 60, R 90 are values that worked in lower light
         if(lefthsvValues[0]>60){
             skyStonePos = 1;
         } else if(righthsvValues[0]>90){
@@ -560,6 +563,7 @@ public class AutoControlsMTZ extends LinearOpMode {
     }
     public void RaiseArmByDegrees(double degrees, int pause) throws InterruptedException {
         if (opModeIsActive()) {
+            RunArmToPosition();
             RaiseByInches (degrees);
             ArmPower(defaultArmPower);
         }
@@ -577,7 +581,7 @@ public class AutoControlsMTZ extends LinearOpMode {
          */
     }
 
-    public void RaiseArm(double degrees, double power,int pause) throws InterruptedException {
+   /* public void RaiseArm(double degrees, double power,int pause) throws InterruptedException {
             if (opModeIsActive()) {
                 raiseByDegrees(degrees);
                 ArmPower(power);
@@ -587,8 +591,21 @@ public class AutoControlsMTZ extends LinearOpMode {
             }
             Thread.sleep(pause);
 
+    }*/
+    public void RaiseArm(double degrees, double power,int pause) throws InterruptedException {
+       // if(hasArmMotorsAndServos) {
+            if (opModeIsActive()) {
+                raiseByDegrees(degrees);
+                RunArmToPosition();
+                ArmPower(power);
+                while (arm.isBusy() || armExtension.isBusy()) {
+                    DisplayArmTelemetry();
+                }
+            }
+            Thread.sleep(pause);
+       // }
     }
-    public void RaiseArm(int distance, int pause) throws InterruptedException {
+    /*public void RaiseArm(int distance, int pause) throws InterruptedException {
         if (opModeIsActive()) {
             RaiseByInches (distance);
             ArmPower(defaultArmPower);
@@ -599,7 +616,7 @@ public class AutoControlsMTZ extends LinearOpMode {
         ArmPower(0);
         Thread.sleep(pause);
 
-    }
+    }*/
     public void ExtendArm(double additionalExtension, double power,int pause) throws InterruptedException {
         if (opModeIsActive()) {
             armExtension.setTargetPosition((int) ((armExtension.getCurrentPosition() + additionalExtension) * ticksPerInchExtension));

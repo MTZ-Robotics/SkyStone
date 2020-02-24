@@ -44,8 +44,8 @@ public class mtzConstants {
     public static final double rightHookUpPosition = 0.5;
     public static final double leftHookDownPosition = 0;
     public static final double rightHookDownPosition = 0;
-    public static final double leftHookInPosition = 1.0;
-    public static final double rightHookInPosition = 1.0;
+    public static final double leftHookInPosition = 1;
+    public static final double rightHookInPosition = 1;
     public static final int handAssistRideHeightLevel = 1;
     public static final int handAssistRideHeightDistance = 1;
     public static final boolean handAssistRideHeightAboveLevel = true;
