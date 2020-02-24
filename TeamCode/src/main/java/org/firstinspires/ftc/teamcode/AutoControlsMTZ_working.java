@@ -22,14 +22,14 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChas
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
 import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo;
 
-@Autonomous(name ="Auto Controls [50]", group = "z_test")
+@Autonomous(name ="Auto Controls working", group = "z_test")
 //Strawberry
 
 //Adds use of Constants File
 
 //@Disabled
 
-public class AutoControlsMTZ_vworking extends LinearOpMode {
+public class AutoControlsMTZ_working extends LinearOpMode {
 
 
     /**************

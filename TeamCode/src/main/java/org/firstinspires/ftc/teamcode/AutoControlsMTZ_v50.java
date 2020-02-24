@@ -22,7 +22,7 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChas
 import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
 import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo;
 
-@Autonomous(name ="Auto Controls [50]", group = "z_test")
+@Autonomous(name ="Auto Controls v50 strawberry", group = "z_test")
 //Strawberry
 
 //Adds use of Constants File
