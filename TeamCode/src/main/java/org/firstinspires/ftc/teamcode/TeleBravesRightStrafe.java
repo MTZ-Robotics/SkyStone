@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(name="Hand Turkey Right Strafe", group ="A_Top")
+@TeleOp(name="Braves Right Strafe", group ="A_Top")
 
 //@Disabled
 

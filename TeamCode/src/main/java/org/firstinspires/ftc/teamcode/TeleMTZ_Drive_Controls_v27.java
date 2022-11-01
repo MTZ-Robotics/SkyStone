@@ -63,7 +63,9 @@ import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo
 import static org.firstinspires.ftc.teamcode.mtzConstants.yellowWarningTime;
 
 
-@TeleOp(name="TeleMTZ_Drive_Controls_v27 Tarragon", group ="A_Top")
+@TeleOp(name="TeleMTZ_Drive_Controls v27 Tarragon", group ="A_Top")
+
+//Tarragon
 
 //Adds run to position to controls map
 //Adds control map error handling
@@ -591,9 +593,6 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
              *************************/
             if(hasChassisMotors) {
                 //Set motors to run manually
-
-
-
                 backLeft.setPower(drivePower * ((driveStick1 + strafeStick) - turnStick));
                 backRight.setPower(drivePower * ((driveStick1 - strafeStick) + turnStick));
                 frontLeft.setPower(drivePower * ((-driveStick1 + strafeStick) + turnStick));
@@ -985,9 +984,9 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
             //sleep(500);
         }
     }
-    public void lightReverse() throws InterruptedException{
+    public void lightForward() throws InterruptedException{
         if (hasChassisMotors) {
-            Drive(-1,0.1,50);
+            Drive(1,0.1,50);
         }
     }
 
@@ -1072,7 +1071,7 @@ public class TeleMTZ_Drive_Controls_v27 extends LinearOpMode {
 
     public void raiseByDegrees(double degrees) {
         if(hasArmMotorsAndServos){
-            arm.setTargetPosition((int)((degrees + armRotationDegreesAtHome) * ticksPerDegreeArm));
+            arm.setTargetPosition((int)((degrees - armRotationDegreesAtHome) * ticksPerDegreeArm));
         }
     }
 

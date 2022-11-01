@@ -4,20 +4,32 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import static org.firstinspires.ftc.teamcode.mtzConstants.*;
+import static org.firstinspires.ftc.teamcode.mtzConstants.armRotationDegreesAtHome;
+import static org.firstinspires.ftc.teamcode.mtzConstants.clawClosedPosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.clawOpenPosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.defaultArmLowerPower;
+import static org.firstinspires.ftc.teamcode.mtzConstants.defaultArmPower;
+import static org.firstinspires.ftc.teamcode.mtzConstants.leftHookUpPosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.rightHookUpPosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.skyStonePosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeArm;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChassis;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
+import static org.firstinspires.ftc.teamcode.mtzConstants.wristConversionToServo;
 
-@Autonomous(name ="Auto Controls v48 Lemongrass", group = "z_test")
+@Autonomous(name ="Auto Controls v50 strawberry", group = "z_test")
+//Strawberry
+
 //Adds use of Constants File
 
-@Disabled
+//@Disabled
 
-public class AutoControlsMTZ_v48 extends LinearOpMode {
+public class AutoControlsMTZ_v50 extends LinearOpMode {
 
 
     /**************
@@ -42,6 +54,8 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
     private static final double driveDistanceAdjustment = 1.00;
     private int allianceReverser = 1;
 
+    double wristPositionDesired = wristConversionToServo(90+armRotationDegreesAtHome);
+
     /*****************
      * Declare motor & servo objects
      ****************/
@@ -55,6 +69,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
     private Servo leftHook;
     private Servo rightHook;
     private Servo blockThrower;
+    private Servo wrist;
     private ColorSensor leftColorSensor;
     private ColorSensor rightColorSensor;
 
@@ -88,6 +103,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
         armExtension = hardwareMap.dcMotor.get("armExtension");
+        wrist = hardwareMap.servo.get("wrist");
         claw = hardwareMap.servo.get("claw");
         rightHook = hardwareMap.servo.get("rightHook");
         leftHook = hardwareMap.servo.get("leftHook");
@@ -97,10 +113,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
-        /**********
-         * Commenting out arm reverse to see if it will keep the arm in the correct direction
-         */
-        //arm.setDirection(DcMotor.Direction.REVERSE);
+        armExtension.setDirection(DcMotor.Direction.REVERSE);
         leftHook.setDirection(Servo.Direction.REVERSE);
 
 
@@ -120,12 +133,11 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         }
         blinkinLedDriver.setPattern(pattern);
 
-
         /********
          * Movement starts here on initialize
          */
-        leftHook.setPosition(0.5);
-        rightHook.setPosition(0.5);
+        leftHook.setPosition(leftHookUpPosition);
+        rightHook.setPosition(rightHookUpPosition);
 
         StopAndResetAllEncoders();
 
@@ -139,11 +151,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         telemetry.update();
         telemetry.log().add(pathToRun+" Initialized. Go "+alliance+" alliance");
 
-        //Paths written for Blue alliance and reverse turns if on Red alliance
-        allianceReverser=1;
-        if (alliance=="Red") {
-            allianceReverser=-1;
-        }
+
         /************************************************************
          * Paths            Paths            Paths          Paths   *
          ************************************************************/
@@ -154,7 +162,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Robot should face towards wall centered in middle tile foundation side.");
+            telemetry.log().add("Robot should face away from wall centered in middle tile foundation side.");
             waitForStart();
             //Turn lights off
             if (alliance=="Blue") {
@@ -170,14 +178,11 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             moveFoundation(allianceReverser);
             //Align to Park
             if (pathToRun=="FoundationBridge") {
-                Strafe(allianceReverser * -8, defaultDriveSpeed, defaultPauseTime);
+                foundationSlideToBridge(allianceReverser);
             } else {
-                Strafe(allianceReverser * 12,0.1,200);
+                foundationSlideToWall(allianceReverser);
             }
-            //Forward to bridge area
-            Drive(24, defaultDriveSpeed, defaultPauseTime);
-            //Park
-            Drive(14, defaultDriveSpeed/2, 0);
+            foundationDriveToPark(allianceReverser);
         } else if (pathToRun=="DepotWall" || pathToRun=="DepotBridge") {
             /************************************
              * Path set up -- Add to each path
@@ -211,7 +216,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Line up in front of the line between the last 2 stones on the end of the quarry near bridge facing quarry");
+            telemetry.log().add("Line up with wheels away from depot centered on the tile seam towards the last stone of the quarry near bridge facing quarry");
             waitForStart();
             //Turn lights off
             if (alliance=="Blue") {
@@ -223,52 +228,60 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             /************
              * Path Start
              ************/
-            leftColorSensor.enableLed(false);
-            rightColorSensor.enableLed(false);
             //Move forward to quarry (quarry distance-robot length-distance from stone to measure)
-            Drive(20, .15, 2000);
+            //Distance 20 works better
+            Drive(48-18-2, .10, 1000);
             sampleSkyStone(allianceReverser);
             //Strafe to SkyStone Position
             double distanceFromStone3ToSkyStone=0;
             if(skyStonePosition==3){
-                Strafe(allianceReverser*8,.2,defaultPauseTime);
+                Strafe(allianceReverser * -4,.1,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 0;
             } else if(skyStonePosition==2){
-                Strafe(0,.2,defaultPauseTime);
+                Strafe(allianceReverser * 4,.1,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 8;
             }else if(skyStonePosition==1){
-                Strafe(allianceReverser*-8,.2,defaultPauseTime);
+                Strafe(allianceReverser * 12,.1,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 16;
             }
             //Raise Arm a little
-            RaiseArm(2,defaultPauseTime);
+            RaiseArm(5 ,defaultArmPower,defaultPauseTime);
+            //Get claw & wrist off of arm and ready to grab
+            wrist.setPosition(wristPositionDesired);
+            claw.setPosition(clawOpenPosition);
             //Extend Arm
-            ExtendArm(4,1,defaultPauseTime);
+            ExtendArm(5,1,defaultPauseTime);
+            Drive(1,.1,defaultPauseTime);
             grabSkyStone(allianceReverser);
             //Reverse to clear bridge post
-            Drive(-12,defaultDriveSpeed,defaultPauseTime);
+            Drive(-12,defaultDriveSpeed/2,defaultPauseTime);
             //Strafe to foundation with block and add on any distance past stone 3 location
-            Strafe((((-3*24) +8 +(int)distanceFromStone3ToSkyStone)*allianceReverser),defaultDriveSpeed,defaultPauseTime);
+            Strafe((allianceReverser*-3*24)+8 + (int)distanceFromStone3ToSkyStone,defaultDriveSpeed,defaultPauseTime);
             //Forward since we are past bridge post
-            Drive(12,defaultDriveSpeed,defaultPauseTime);
-
+            Drive(8,defaultDriveSpeed/2,defaultPauseTime);
+            //Open claw to allow block to be pushed into foundation
+            claw.setPosition(clawOpenPosition);
+            Drive(4,defaultDriveSpeed/4,defaultPauseTime);
+            //Lower Arm a little
+            RaiseArm(-4,defaultArmLowerPower,defaultPauseTime);
             moveFoundation(allianceReverser);
+            //Once arm is working, we can use this here
+            //claw.setPosition(clawOpenPosition);
             //Align to Park
             if (pathToRun=="DepotSampleBridge") {
-                Strafe(allianceReverser * -8, defaultDriveSpeed, defaultPauseTime);
+                foundationSlideToBridge(allianceReverser);
             } else {
-                Strafe(allianceReverser * 12,0.1,200);
+                foundationSlideToWall(allianceReverser);
             }
-            //Forward to bridge area
-            Drive(22, defaultDriveSpeed, defaultPauseTime);
-            //Park
-            Drive(14, defaultDriveSpeed/2, 0);
+            foundationDriveToPark(allianceReverser);
+            //Retract Arm
+            ExtendArm(-5,1,0);
         } else if (pathToRun=="FoundationSampleWall") {
             /************************************
              * Path set up -- Add to each path
              ***********************************/
             //Robot Setup Notes
-            telemetry.log().add("Robot should face towards wall centered in middle tile foundation side.");
+            telemetry.log().add("Robot should face away from wall centered in middle tile foundation side.");
             waitForStart();
             //Turn lights off
             if (alliance=="Blue") {
@@ -360,9 +373,9 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         // End of Paths
     }
 
-
-
-    //Path Methods
+    /**********************
+     * Path Methods
+     **********************/
     public void goToFoundationfromWall(int allianceReverser) throws InterruptedException{
 
         //Align Hooks With Foundation
@@ -378,9 +391,9 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
 
         //Move Foundation to Build Zone
         Drive(-20, 0.2, defaultPauseTime);
-        Turn(allianceReverser * 40, 0.2, defaultPauseTime);
-        Drive(5, -0.2, defaultPauseTime);
-        Turn(allianceReverser * 80, 0.2, defaultPauseTime);
+        Turn(allianceReverser * -40, 0.2, defaultPauseTime);
+        Drive(-5, 0.2, defaultPauseTime);
+        Turn(allianceReverser * -80, 0.2, defaultPauseTime);
         Strafe(allianceReverser * 5, 0.2, defaultPauseTime);
         Drive(12, 0.1, defaultPauseTime);
 
@@ -422,8 +435,19 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         Turn(allianceReverser*20,defaultTurnSpeed,defaultPauseTime);
         Drive(24, defaultDriveSpeed*2, defaultPauseTime);
     }
-
-    public void grabSkyStone(int allianceReverser) throws InterruptedException {//Angle towards skystone
+    public void foundationSlideToBridge(int aR) throws InterruptedException{
+        Strafe(aR * 6, defaultDriveSpeed, defaultPauseTime);
+    }
+    public void foundationSlideToWall(int aR) throws InterruptedException{
+        Strafe(aR * -12, defaultDriveSpeed, defaultPauseTime);
+    }
+    public void foundationDriveToPark(int aR) throws InterruptedException{
+        //Forward to bridge area
+        Drive(-22, defaultDriveSpeed, defaultPauseTime);//Used to be 24
+        //Park
+        Drive(-14, defaultDriveSpeed/2, 0);
+    }
+    public void grabSkyStone(int allianceReverser) throws InterruptedException {
         //CloseClaw();
         claw.setPosition(clawClosedPosition);
         //Wait for it to close
@@ -482,9 +506,12 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         // Not Seen = 0
         int skyStonePos = 0;
 
-        if(righthsvValues[0]>80){
+        //Need to measure this and adjust the constant,
+        //Color sensors are different versions; Left is V2 & Right is V3
+        // L 60, R 90 are values that worked in lower light
+        if(lefthsvValues[0]>60){
             skyStonePos = 1;
-        } else if(lefthsvValues[0]>80){
+        } else if(righthsvValues[0]>90){
             skyStonePos = 2;
         }
 
@@ -551,10 +578,25 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
 
          */
     }
+
+    public void RaiseArm(double degrees, double power,int pause) throws InterruptedException {
+            if (opModeIsActive()) {
+                raiseByDegrees(degrees);
+                ArmPower(power);
+                while (arm.isBusy() || armExtension.isBusy()) {
+                    DisplayArmTelemetry();
+                }
+            }
+            Thread.sleep(pause);
+
+    }
     public void RaiseArm(int distance, int pause) throws InterruptedException {
         if (opModeIsActive()) {
             RaiseByInches (distance);
             ArmPower(defaultArmPower);
+        }
+        while(arm.isBusy()){
+            DisplayArmTelemetry();
         }
         ArmPower(0);
         Thread.sleep(pause);
@@ -669,8 +711,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
     }
 
     public void raiseByDegrees(double degrees) {
-        int correctedDistance = (int)(degrees * ticksPerDegreeArm);
-        arm.setTargetPosition(correctedDistance);
+            arm.setTargetPosition((int)((degrees - armRotationDegreesAtHome) * ticksPerDegreeArm));
     }
 
     //End of distance calculation methods

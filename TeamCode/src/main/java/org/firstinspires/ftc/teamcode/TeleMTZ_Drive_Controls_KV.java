@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -232,11 +233,8 @@ public class TeleMTZ_Drive_Controls_KV extends LinearOpMode {
                 arm.setPower( armPower * (gamepad2.left_stick_y) );
             }
 
-            if (gamepad2.left_stick_x != 0) {
                 armExtension.setPower((gamepad2.left_stick_x));
-            } else if (gamepad2.left_stick_y != 0) {
-                armExtension.setPower((gamepad2.left_stick_x));
-            }
+
 
             /*************
              * Claw Controls

@@ -4,20 +4,24 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import static org.firstinspires.ftc.teamcode.mtzConstants.*;
+import static org.firstinspires.ftc.teamcode.mtzConstants.clawClosedPosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.defaultArmPower;
+import static org.firstinspires.ftc.teamcode.mtzConstants.skyStonePosition;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeArm;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerDegreeTurnChassis;
+import static org.firstinspires.ftc.teamcode.mtzConstants.ticksPerInchExtension;
 
-@Autonomous(name ="Auto Controls v48 Lemongrass", group = "z_test")
-//Adds use of Constants File
+@Autonomous(name ="Auto Controls 47 Thyme", group = "z_test")
+//Adds adjustment variables
+//Adds additional paths for sensed auto
+//@Disabled
 
-@Disabled
-
-public class AutoControlsMTZ_v48 extends LinearOpMode {
+public class AutoControlsMTZ_v47 extends LinearOpMode {
 
 
     /**************
@@ -35,7 +39,8 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
     private static final double ticksPerRevolution = 145.6;
     private static final double gearReduction = 2.0;
     private static final double wheelDiameterInches = 4.0;
-    private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (Math.PI * wheelDiameterInches);
+    private static final double pi = 3.1415;
+    private static final double conversionTicksToInches = (ticksPerRevolution * gearReduction) / (pi * wheelDiameterInches);
     private static final double experimentalInchesPerTurn = 91.8;
     private static final double armDistanceAdjustment = 200.00;
     private static final double strafeDistanceAdjustment = 1.00;
@@ -109,13 +114,10 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
          *************/
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        //Paths written for Blue alliance and reverse turns if on Red alliance
-
         if (alliance=="Blue") {
-            allianceReverser = 1;
+
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_BLUE;
         } else if (alliance=="Red") {
-            allianceReverser = -1;
             pattern = RevBlinkinLedDriver.BlinkinPattern.BREATH_RED;
         }
         blinkinLedDriver.setPattern(pattern);
@@ -223,21 +225,19 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             /************
              * Path Start
              ************/
-            leftColorSensor.enableLed(false);
-            rightColorSensor.enableLed(false);
             //Move forward to quarry (quarry distance-robot length-distance from stone to measure)
-            Drive(20, .15, 2000);
+            Drive(48-18-3, .2, defaultPauseTime);
             sampleSkyStone(allianceReverser);
             //Strafe to SkyStone Position
             double distanceFromStone3ToSkyStone=0;
             if(skyStonePosition==3){
-                Strafe(allianceReverser*8,.2,defaultPauseTime);
+                Strafe(allianceReverser*4,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 0;
             } else if(skyStonePosition==2){
-                Strafe(0,.2,defaultPauseTime);
+                Strafe(allianceReverser*-4,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 8;
             }else if(skyStonePosition==1){
-                Strafe(allianceReverser*-8,.2,defaultPauseTime);
+                Strafe(allianceReverser*-12,.2,defaultPauseTime);
                 distanceFromStone3ToSkyStone = 16;
             }
             //Raise Arm a little
@@ -248,7 +248,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
             //Reverse to clear bridge post
             Drive(-12,defaultDriveSpeed,defaultPauseTime);
             //Strafe to foundation with block and add on any distance past stone 3 location
-            Strafe((((-3*24) +8 +(int)distanceFromStone3ToSkyStone)*allianceReverser),defaultDriveSpeed,defaultPauseTime);
+            Strafe((-3*24)+8 + (int)distanceFromStone3ToSkyStone,defaultDriveSpeed,defaultPauseTime);
             //Forward since we are past bridge post
             Drive(12,defaultDriveSpeed,defaultPauseTime);
 
@@ -260,7 +260,7 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
                 Strafe(allianceReverser * 12,0.1,200);
             }
             //Forward to bridge area
-            Drive(22, defaultDriveSpeed, defaultPauseTime);
+            Drive(24, defaultDriveSpeed, defaultPauseTime);
             //Park
             Drive(14, defaultDriveSpeed/2, 0);
         } else if (pathToRun=="FoundationSampleWall") {
@@ -482,9 +482,9 @@ public class AutoControlsMTZ_v48 extends LinearOpMode {
         // Not Seen = 0
         int skyStonePos = 0;
 
-        if(righthsvValues[0]>80){
+        if(lefthsvValues[0]>60){
             skyStonePos = 1;
-        } else if(lefthsvValues[0]>80){
+        } else if(righthsvValues[0]>90){
             skyStonePos = 2;
         }
 

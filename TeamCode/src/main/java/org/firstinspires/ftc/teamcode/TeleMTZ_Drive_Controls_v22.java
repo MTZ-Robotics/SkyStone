@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="TeleMTZ_Drive_Controls_v22 Pepper", group ="A_Top")
 
-@Disabled
+//@Disabled
 
 public class TeleMTZ_Drive_Controls_v22 extends LinearOpMode {
 
